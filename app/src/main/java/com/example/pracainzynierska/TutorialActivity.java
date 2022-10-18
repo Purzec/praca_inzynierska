@@ -9,24 +9,24 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 
-import com.example.pracainzynierska.databinding.ActivityFullscreenBinding;
+import com.example.pracainzynierska.databinding.ActivityTutorialBinding;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenActivity extends AppCompatActivity {
-
+public class TutorialActivity extends AppCompatActivity {
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
-    private final Handler mHideHandler = new Handler();
+    private final Handler mHideHandler = new Handler(Looper.myLooper());
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -49,7 +49,6 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         }
     };
-
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
@@ -60,7 +59,6 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         }
     };
-
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
@@ -68,15 +66,14 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
 
-    private ActivityFullscreenBinding binding;
+    private ActivityTutorialBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityFullscreenBinding.inflate(getLayoutInflater());
+        binding = ActivityTutorialBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
 
         mContentView = binding.solo;
 
@@ -84,7 +81,6 @@ public class FullscreenActivity extends AppCompatActivity {
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(FullscreenActivity.this,TutorialActivity.class));
                 System.out.println("test");
             }
         });
@@ -99,6 +95,7 @@ public class FullscreenActivity extends AppCompatActivity {
         // are available.
         delayedHide(100);
     }
+
     private void hide() {
         // Hide UI first
         ActionBar actionBar = getSupportActionBar();

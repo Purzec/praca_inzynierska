@@ -18,3 +18,7 @@ s
 Capp/src/test/java/com/example/pracainzynierska/ExampleUnitTest.java,6\5\6542484f474c22d0f82a7bdcd16f508f2b3632a7
 F
 app/proguard-rules.pro,9\e\9e08934d811afe28fbc77aaa3c0d747b94348db9
+<
+build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
+X
+(gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e

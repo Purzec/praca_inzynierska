@@ -30,6 +30,10 @@ public class ArmyToken {
      */
     private List<Attack> attacks;
 
+    /**
+     * Adres do zdjęć
+     */
+    private String imgAddress;
 
 
 }

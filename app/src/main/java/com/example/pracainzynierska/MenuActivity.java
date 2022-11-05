@@ -9,22 +9,21 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
+import android.widget.Button;
 
-import com.example.pracainzynierska.databinding.ActivityFullscreenBinding;
+import com.example.pracainzynierska.databinding.ActivityMenuBinding;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenActivity extends AppCompatActivity {
+public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
 
-    /**
-     * Some older devices needs a small delay between UI widget updates
-     * and a change of the status and navigation bar.
-     */
+
+
+    private Button tutorialButton;
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
@@ -68,26 +67,18 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
 
-    private ActivityFullscreenBinding binding;
+    private ActivityMenuBinding binding;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityFullscreenBinding.inflate(getLayoutInflater());
+        binding = ActivityMenuBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-
-        mContentView = binding.solo;
-
-        // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(FullscreenActivity.this,TutorialActivity.class));
-                System.out.println("test");
-            }
-        });
+        mContentView = binding.tutorial;
+        tutorialButton = findViewById(R.id.tutorial);
+        tutorialButton.setOnClickListener(this);
     }
 
     @Override
@@ -117,5 +108,20 @@ public class FullscreenActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.tutorial:
+                startActivity(new Intent(MenuActivity.this, TutorialActivity.class));
+                finish();
+                break;
+
+            case R.id.game:
+
+                break;
+
+        }
     }
 }

@@ -3,4 +3,8 @@
         <attr name="fullscreenBackgroundColor" format="color" />
         <attr name="fullscreenTextColor" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="HexBoard">
+        <attr name="background_color" format="color" />
+    </declare-styleable>
 </resources>

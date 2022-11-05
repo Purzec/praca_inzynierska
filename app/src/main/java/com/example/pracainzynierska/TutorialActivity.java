@@ -5,22 +5,35 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.example.pracainzynierska.databinding.ActivityTutorialBinding;
+import com.example.pracainzynierska.model.Hex;
+import com.example.pracainzynierska.model.view.HexBoard;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
-public class TutorialActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+
+public class TutorialActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private RelativeLayout imgWithButton;
+    private Button button;
+    private ImageButton infoButton;
+    private ImageView playuerHexagonMaskView;
+    private ViewGroup viewGroup;
+    private HexBoard hexBoard;
+    private ArrayList<Hex> listatest;
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -49,6 +62,7 @@ public class TutorialActivity extends AppCompatActivity {
             }
         }
     };
+    private View mControlsView;
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
@@ -57,8 +71,10 @@ public class TutorialActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.show();
             }
+            mControlsView.setVisibility(View.VISIBLE);
         }
     };
+    private boolean mVisible;
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
@@ -71,30 +87,47 @@ public class TutorialActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityTutorialBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        //dac jakis obiekt zeby mial z czeg odane zaciagnac
+        mContentView = binding.RelativeLayout1;
+        mVisible = true;
 
-        mContentView = binding.solo;
-
-        // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
+        hexBoard = findViewById(R.id.hexBoard);
+        viewGroup = findViewById(R.id.RelativeLayout1);
+        viewGroup.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void onClick(View view) {
-                System.out.println("test");
+            public void onGlobalLayout() {
+                System.out.println(hexBoard.getScreenWidth());
+                listatest = hexBoard.pobierzKordy();
+                System.out.println(listatest.get(0).getHexpositionX());
+                System.out.println(listatest.get(0).getHexpositionY());
+
+                playuerHexagonMaskView = new ImageView(getApplicationContext());
+                playuerHexagonMaskView.setImageDrawable(getDrawable(R.drawable.token_1));
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
+                playuerHexagonMaskView.setLayoutParams(lp);
+                viewGroup.addView(playuerHexagonMaskView);
+                playuerHexagonMaskView.setX(listatest.get(2).getHexpositionX() - playuerHexagonMaskView.getLayoutParams().width / 2);
+                playuerHexagonMaskView.setY(listatest.get(2).getHexpositionY() - playuerHexagonMaskView.getLayoutParams().height / 2);
             }
         });
+
+
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
         delayedHide(100);
+        button = findViewById(R.id.closeButton);
+        infoButton = findViewById(R.id.infoButton);
+        infoButton.setOnClickListener(this);
+        button.setOnClickListener(this);
+        imgWithButton = findViewById(R.id.imgWithButton);
     }
+
 
     private void hide() {
         // Hide UI first
@@ -107,6 +140,7 @@ public class TutorialActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
     }
 
+
     /**
      * Schedules a call to hide() in delay milliseconds, canceling any
      * previously scheduled calls.
@@ -114,5 +148,17 @@ public class TutorialActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.closeButton:
+                imgWithButton.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.infoButton:
+                imgWithButton.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 }

@@ -22,3 +22,7 @@ F
 build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
 X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
+p
+@app/src/main/java/com/example/pracainzynierska/model/Attack.java,e\b\ebd572bb8b71314c99d59aaacea6bf7fcf0a9729
+z
+Japp/src/main/java/com/example/pracainzynierska/model/enums/AttackType.java,b\e\bebd4945dd1bf8a3c9991fa367e40f8ac8d82299

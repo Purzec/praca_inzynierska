@@ -3,27 +3,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/fullscreenBackgroundColor"
+    android:background="@drawable/background_main_menu"
     android:theme="@style/ThemeOverlay.PracaInzynierska.FullscreenContainer"
-    tools:context=".FullscreenActivity"
+    tools:context=".MenuActivity"
     >
 
     <LinearLayout
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/solo"
-            android:layout_width="match_parent"
+            android:id="@+id/tutorial"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/solo" />
+            android:text="@string/tutorial"
+            android:backgroundTint="@color/black_overlay"/>
 
         <Button
-            android:id="@+id/multi"
-            android:layout_width="match_parent"
+            android:id="@+id/game"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/multi" />
+            android:text="@string/game"
+            android:backgroundTint="@color/black_overlay"/>
 
     </LinearLayout>
 

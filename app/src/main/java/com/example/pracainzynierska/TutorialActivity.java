@@ -4,21 +4,27 @@ import android.annotation.SuppressLint;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MotionEventCompat;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import com.example.pracainzynierska.commons.HexUtils;
 import com.example.pracainzynierska.databinding.ActivityTutorialBinding;
+import com.example.pracainzynierska.model.ArmyToken;
 import com.example.pracainzynierska.model.Hex;
 import com.example.pracainzynierska.model.view.HexBoard;
 
@@ -30,10 +36,11 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
     private RelativeLayout imgWithButton;
     private Button button;
     private ImageButton infoButton;
-    private ImageView playuerHexagonMaskView;
+    private ArmyToken playerBase;
     private ViewGroup viewGroup;
     private HexBoard hexBoard;
     private ArrayList<Hex> listatest;
+    private int etap = 1;
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -92,26 +99,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         //dac jakis obiekt zeby mial z czeg odane zaciagnac
         mContentView = binding.RelativeLayout1;
         mVisible = true;
-
         hexBoard = findViewById(R.id.hexBoard);
-        viewGroup = findViewById(R.id.RelativeLayout1);
-        viewGroup.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                System.out.println(hexBoard.getScreenWidth());
-                listatest = hexBoard.pobierzKordy();
-                System.out.println(listatest.get(0).getHexpositionX());
-                System.out.println(listatest.get(0).getHexpositionY());
-
-                playuerHexagonMaskView = new ImageView(getApplicationContext());
-                playuerHexagonMaskView.setImageDrawable(getDrawable(R.drawable.token_1));
-                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
-                playuerHexagonMaskView.setLayoutParams(lp);
-                viewGroup.addView(playuerHexagonMaskView);
-                playuerHexagonMaskView.setX(listatest.get(2).getHexpositionX() - playuerHexagonMaskView.getLayoutParams().width / 2);
-                playuerHexagonMaskView.setY(listatest.get(2).getHexpositionY() - playuerHexagonMaskView.getLayoutParams().height / 2);
-            }
-        });
 
 
     }
@@ -126,6 +114,13 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         infoButton.setOnClickListener(this);
         button.setOnClickListener(this);
         imgWithButton = findViewById(R.id.imgWithButton);
+        viewGroup = findViewById(R.id.RelativeLayout1);
+        listatest = hexBoard.pobierzKordy();
+
+
+        System.out.println("test");
+
+
     }
 
 
@@ -155,10 +150,88 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         switch (view.getId()) {
             case R.id.closeButton:
                 imgWithButton.setVisibility(View.INVISIBLE);
+                getQuiz(etap);
+
                 break;
             case R.id.infoButton:
                 imgWithButton.setVisibility(View.VISIBLE);
+                imgWithButton.bringToFront();
                 break;
         }
     }
+
+    //todo jp dodać nowe tokeny baz i zabezpieczenie przed nastepnym stworzeniem tokenu
+    private void getQuiz(int etap) {
+        switch (etap) {
+            case 1:
+                //dodac sprawdzenie czy juz było wywołane todo jp 
+                //dodanie tokenu bazy gracza
+                playerBase = new ArmyToken(getApplicationContext());
+                playerBase.setBackground(getDrawable(R.drawable.token_1));
+             //   playerBase.setContextClickable(getApplicationContext());
+              //  playerBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
+                playerBase.setLayoutParams(lp);
+                HexUtils.getToLobby(playerBase, 1);
+                viewGroup.addView(playerBase);
+
+               /* ArmyToken enemyBase = new ArmyToken(getApplicationContext());
+                enemyBase.setImageView(new ImageView(getApplicationContext()));
+                enemyBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
+                enemyBase.getImageView().setLayoutParams(new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5));
+                HexUtils.setHexToBoard(listatest.get(2), enemyBase);
+                viewGroup.addView(enemyBase);*/
+                playerBase.setOnTouchListener(onTouchListener(playerBase));
+                break;
+        }
+
+
+    }
+
+    private int xDelta;
+    private int yDelta;
+
+    private View.OnTouchListener onTouchListener(ArmyToken tokenG) {
+
+
+        return new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                final int x = (int) event.getRawX();
+                final int y = (int) event.getRawY();
+                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                    case MotionEvent.ACTION_DOWN:
+                        System.out.println("ACTION_DOWN");
+                        ConstraintLayout.LayoutParams lParams = (ConstraintLayout.LayoutParams)
+                                view.getLayoutParams();
+                        xDelta = x - lParams.leftMargin;
+                        yDelta = y - lParams.topMargin;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        System.out.println("ACTION_UP");
+                     //   HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
+                   //    tokenG.confirmPositionToken(viewGroup,getApplicationContext(),tokenG);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        System.out.println("ACTION_MOVE");
+                        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view
+                                .getLayoutParams();
+                        layoutParams.startToEnd = x - xDelta;
+                        layoutParams.topToBottom = y - yDelta;
+                        layoutParams.rightMargin = 0;
+                        layoutParams.bottomMargin = 0;
+                        //pobrac srodek obrazka
+                        playerBase.setX(x - playerBase.getWidth());
+                        playerBase.setY(y - playerBase.getHeight() / 2);
+                        view.setLayoutParams(layoutParams);
+                        break;
+                }
+                viewGroup.invalidate();
+                return true;
+            }
+        };
+    }
+
+
 }

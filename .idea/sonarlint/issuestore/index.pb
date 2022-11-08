@@ -26,3 +26,11 @@ p
 @app/src/main/java/com/example/pracainzynierska/model/Attack.java,e\b\ebd572bb8b71314c99d59aaacea6bf7fcf0a9729
 z
 Japp/src/main/java/com/example/pracainzynierska/model/enums/AttackType.java,b\e\bebd4945dd1bf8a3c9991fa367e40f8ac8d82299
+@
+app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
+P
+ app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
+z
+Japp/src/main/java/com/example/pracainzynierska/model/enums/Directions.java,3\f\3f65676007bc8ab92b8252e36c79beac3046f4e8
+p
+@app/src/main/java/com/example/pracainzynierska/MenuActivity.java,5\b\5b14ab094dd59fa097f3b7d2e8efff4c9494b8a9

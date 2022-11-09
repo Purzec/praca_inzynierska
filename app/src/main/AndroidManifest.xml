@@ -9,6 +9,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PracaInzynierska">
         <activity
+            android:name=".TutorialActivity2"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:label="@string/title_activity_tutorial2"
+            android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
+        <activity
             android:name=".TutorialActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"

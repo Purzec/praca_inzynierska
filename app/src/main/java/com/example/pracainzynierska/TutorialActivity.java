@@ -8,10 +8,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.MotionEventCompat;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +43,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
     private HexBoard hexBoard;
     private ArrayList<Hex> listatest;
     private int etap = 1;
+    private int bylo = 0;
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -118,9 +121,6 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         listatest = hexBoard.pobierzKordy();
 
 
-        System.out.println("test");
-
-
     }
 
 
@@ -155,6 +155,10 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.infoButton:
                 imgWithButton.setVisibility(View.VISIBLE);
+                System.out.println(imgWithButton.getLayoutParams().width);
+                System.out.println(imgWithButton.getLayoutParams().height);
+                imgWithButton.setX((float) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.2));
+                imgWithButton.setY((float) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.10));
                 imgWithButton.bringToFront();
                 break;
         }
@@ -164,25 +168,29 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
     private void getQuiz(int etap) {
         switch (etap) {
             case 1:
-                //dodac sprawdzenie czy juz było wywołane todo jp 
-                //dodanie tokenu bazy gracza
-                playerBase = new ArmyToken(getApplicationContext());
-                playerBase.setBackground(getDrawable(R.drawable.token_1));
-             //   playerBase.setContextClickable(getApplicationContext());
-              //  playerBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
-                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
-                playerBase.setLayoutParams(lp);
-                HexUtils.getToLobby(playerBase, 1);
-                viewGroup.addView(playerBase);
+                if (bylo == 0) {
+                    bylo++;
+                    //dodac sprawdzenie czy juz było wywołane todo jp
+                    //dodanie tokenu bazy gracza
+                    playerBase = new ArmyToken(getApplicationContext());
+                    playerBase.setBackground(getDrawable(R.drawable.token_1));
+                    //   playerBase.setContextClickable(getApplicationContext());
+                    //  playerBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
+                    ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
+                    playerBase.setLayoutParams(lp);
+                    HexUtils.getToLobby(playerBase, 1);
+                    viewGroup.addView(playerBase);
 
-               /* ArmyToken enemyBase = new ArmyToken(getApplicationContext());
+                ArmyToken enemyBase = new ArmyToken(getApplicationContext());
                 enemyBase.setImageView(new ImageView(getApplicationContext()));
-                enemyBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
-                enemyBase.getImageView().setLayoutParams(new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5));
-                HexUtils.setHexToBoard(listatest.get(2), enemyBase);
-                viewGroup.addView(enemyBase);*/
-                playerBase.setOnTouchListener(onTouchListener(playerBase));
+                enemyBase.setBackground(getDrawable(R.drawable.token_1));
+                enemyBase.setLayoutParams(new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5));
+                HexUtils.setHexToBoard(listatest, enemyBase,2);
+                viewGroup.addView(enemyBase);
+                    playerBase.setOnTouchListener(onTouchListener(playerBase));
+                }
                 break;
+
         }
 
 
@@ -210,8 +218,12 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                         break;
                     case MotionEvent.ACTION_UP:
                         System.out.println("ACTION_UP");
-                     //   HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
-                   //    tokenG.confirmPositionToken(viewGroup,getApplicationContext(),tokenG);
+                        int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
+                       boolean confirmed =  tokenG.confirmPositionToken(viewGroup,getApplicationContext(),tokenG,listatest,idPola);
+                        if (confirmed)
+                        {
+                            startActivity(new Intent(TutorialActivity.this,TutorialActivity2.class));
+                        }
                         break;
                     case MotionEvent.ACTION_MOVE:
                         System.out.println("ACTION_MOVE");

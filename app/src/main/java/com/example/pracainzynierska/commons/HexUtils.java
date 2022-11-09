@@ -22,11 +22,11 @@ public class HexUtils extends Application {
      static float systemHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
 
 
-    public static ImageView setHexToBoard(Hex hex, ImageView imageView){
-        imageView.setX(hex.getHexpositionX() - imageView.getLayoutParams().width / 2);
-        imageView.setY(hex.getHexpositionY() - imageView.getLayoutParams().height / 2);
+    public static ArmyToken setHexToBoard(List<Hex> hex, ArmyToken armyToken, int idPola){
+        armyToken.setX(hex.get(idPola).getHexpositionX() - armyToken.getLayoutParams().width / 2);
+        armyToken.setY(hex.get(idPola).getHexpositionY() - armyToken.getLayoutParams().height / 2);
 
-        return imageView;
+        return armyToken;
     }
 //3,
     public static ArmyToken getToLobby(ArmyToken imageView, int slot){
@@ -50,9 +50,9 @@ public class HexUtils extends Application {
 
 
 
-    public static void takeOnNerbyEmptyPlace(Hex hex,List<Hex>listatest) {
-        float pozycjaKoncowaObrazkaX = hex.getImageView().getX() + (float) hex.getImageView().getWidth() / 2;
-        float pozycjaKoncowaObrazkaY = hex.getImageView().getY() + (float) hex.getImageView().getHeight() / 2;
+    public static int takeOnNerbyEmptyPlace(ArmyToken hex,List<Hex>listatest) {
+        float pozycjaKoncowaObrazkaX = hex.getX() + (float) hex.getWidth() / 2;
+        float pozycjaKoncowaObrazkaY = hex.getY() + (float) hex.getHeight() / 2;
         float pierwszaPozycja;
         float drugaPozycja = 6480000;
 
@@ -67,10 +67,10 @@ public class HexUtils extends Application {
             }
         }
 
-        hex.getImageView().setX(najbliższyHex.getHexpositionX() - hex.getImageView().getWidth() / 2);
-        hex.getImageView().setY(najbliższyHex.getHexpositionY() - hex.getImageView().getHeight() / 2);
+        hex.setX(najbliższyHex.getHexpositionX() - hex.getWidth() / 2);
+        hex.setY(najbliższyHex.getHexpositionY() - hex.getHeight() / 2);
 
-
+return najbliższyHex.getId();
 
     }
 

@@ -141,25 +141,45 @@ public class HexBoard extends View {
 
     public ArrayList<Hex> pobierzKordy() {
 
+        hex1.setId(0);
         lista.add(hex1);
+        hex2.setId(1);
         lista.add(hex2);
+        hex3.setId(2);
         lista.add(hex3);
+        hex4.setId(3);
         lista.add(hex4);
+        hex5.setId(4);
         lista.add(hex5);
+        hex6.setId(5);
         lista.add(hex6);
+        hex7.setId(6);
         lista.add(hex7);
+        hex8.setId(7);
         lista.add(hex8);
+        hex9.setId(8);
         lista.add(hex9);
+        hex10.setId(9);
         lista.add(hex10);
+        hex11.setId(10);
         lista.add(hex11);
+        hex12.setId(11);
         lista.add(hex12);
+        hex13.setId(12);
         lista.add(hex13);
+        hex14.setId(13);
         lista.add(hex14);
+        hex15.setId(14);
         lista.add(hex15);
+        hex16.setId(15);
         lista.add(hex16);
+        hex17.setId(16);
         lista.add(hex17);
+        hex18.setId(17);
         lista.add(hex18);
+        hex19.setId(18);
         lista.add(hex19);
+
 
         return lista;
     }

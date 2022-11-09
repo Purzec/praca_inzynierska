@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.pracainzynierska.R;
+import com.example.pracainzynierska.commons.HexUtils;
 
 import java.util.List;
 
@@ -105,8 +106,9 @@ public class ArmyToken extends View {
     }
 
 
-    public void confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken hex) {
+    public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola) {
 // pobierz rozmiary ekrany
+        final boolean[] confirmed = {false};
         ImageView ok = new ImageView(context);
         ok.setImageDrawable(context.getDrawable(R.drawable.ok));
         ViewGroup.LayoutParams lpOk = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
@@ -132,10 +134,27 @@ public class ArmyToken extends View {
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("kliknąłes ok");
+                hexList.get(idPola).setBusy(true);
+                hexList.get(idPola).setArmyToken(armyToken);
+                viewGroup.removeView(ok);
+                viewGroup.removeView(no);
+                armyToken.setOnTouchListener(null);
+
+               confirmed[0] = true;
             }
         });
 
+        no.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // przesun armyTOken na pozycje poczatkową do wolnego slotu w lobby
+                HexUtils.getToLobby(armyToken, 1);
+                viewGroup.removeView(ok);
+                viewGroup.removeView(no);
+            }
+        });
+
+return confirmed[0];
 
     }
 }

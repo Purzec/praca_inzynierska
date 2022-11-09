@@ -19,6 +19,7 @@ import java.util.Optional;
 
 public class Hex{
 
+    private int id;
     private List<Hex> neighbours;
     private List<Directions> directionList;
     private float HexpositionX;
@@ -27,6 +28,7 @@ public class Hex{
     static float systemWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     static float systemHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
     private ImageView imageView;
+    private ArmyToken armyToken;
 
 
 
@@ -138,4 +140,19 @@ public class Hex{
         this.imageView = imageView;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public ArmyToken getArmyToken() {
+        return armyToken;
+    }
+
+    public void setArmyToken(ArmyToken armyToken) {
+        this.armyToken = armyToken;
+    }
 }

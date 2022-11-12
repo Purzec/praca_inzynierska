@@ -2,6 +2,7 @@ package com.example.pracainzynierska.model;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -41,16 +42,31 @@ public class ArmyToken extends View {
      * Lista ataków
      */
     private List<Attack> attacks;
-
-    /**
-     * Adres do zdjęć
-     */
-    private String imgAddress;
-
     /**
      * Zdjęcie
      */
     private ImageView imageView;
+
+    /**
+     * Punkty zycia tokenu
+     */
+    private int life;
+
+    /**
+     * Obrazek wczytany do bazy danych
+     */
+    private Drawable imgToDatabase;
+
+
+    private boolean onBoard = false;
+
+    public boolean isOnBoard() {
+        return onBoard;
+    }
+
+    public void setOnBoard(boolean onBoard) {
+        this.onBoard = onBoard;
+    }
 
     public ArmyToken(Context context) {
         super(context);
@@ -89,14 +105,6 @@ public class ArmyToken extends View {
         this.attacks = attacks;
     }
 
-    public String getImgAddress() {
-        return imgAddress;
-    }
-
-    public void setImgAddress(String imgAddress) {
-        this.imgAddress = imgAddress;
-    }
-
     public ImageView getImageView() {
         return imageView;
     }
@@ -105,10 +113,27 @@ public class ArmyToken extends View {
         this.imageView = imageView;
     }
 
+    public int getLife() {
+        return life;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
+    }
+
+    public Drawable getImgToDatabase() {
+        return imgToDatabase;
+    }
+
+    public void setImgToDatabase(Drawable imgToDatabase) {
+        this.imgToDatabase = imgToDatabase;
+    }
+
+
 
     public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola) {
 // pobierz rozmiary ekrany
-        final boolean[] confirmed = {false};
+        armyToken.setOnTouchListener(null);
         ImageView ok = new ImageView(context);
         ok.setImageDrawable(context.getDrawable(R.drawable.ok));
         ViewGroup.LayoutParams lpOk = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
@@ -139,8 +164,7 @@ public class ArmyToken extends View {
                 viewGroup.removeView(ok);
                 viewGroup.removeView(no);
                 armyToken.setOnTouchListener(null);
-
-               confirmed[0] = true;
+                armyToken.setOnBoard(true);
             }
         });
 
@@ -154,7 +178,7 @@ public class ArmyToken extends View {
             }
         });
 
-return confirmed[0];
+return armyToken.isOnBoard();
 
     }
 }

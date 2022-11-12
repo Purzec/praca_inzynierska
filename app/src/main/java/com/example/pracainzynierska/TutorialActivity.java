@@ -9,6 +9,8 @@ import androidx.core.view.MotionEventCompat;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,9 +20,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -38,12 +42,14 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
     private RelativeLayout imgWithButton;
     private Button button;
     private ImageButton infoButton;
+    private ImageButton nextButton;
     private ArmyToken playerBase;
     private ViewGroup viewGroup;
     private HexBoard hexBoard;
     private ArrayList<Hex> listatest;
     private int etap = 1;
     private int bylo = 0;
+
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -92,6 +98,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         }
     };
 
+    boolean confirmed = false;
     private ActivityTutorialBinding binding;
 
     @Override
@@ -103,9 +110,11 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         mContentView = binding.RelativeLayout1;
         mVisible = true;
         hexBoard = findViewById(R.id.hexBoard);
-
-
+        nextButton = findViewById(R.id.nextButton);
+        playerBase = new ArmyToken(getApplicationContext());
+        nextButton.setOnClickListener(this);
     }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -161,6 +170,13 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                 imgWithButton.setY((float) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.10));
                 imgWithButton.bringToFront();
                 break;
+            case R.id.nextButton:
+                if (playerBase.isOnBoard()) {
+                    startActivity(new Intent(TutorialActivity.this, TutorialActivity2.class));
+                } else {
+                    Toast.makeText(getApplicationContext(), "Postaw najpierw żeton na planszy", Toast.LENGTH_LONG).show();
+                }
+                break;
         }
     }
 
@@ -172,7 +188,6 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     bylo++;
                     //dodac sprawdzenie czy juz było wywołane todo jp
                     //dodanie tokenu bazy gracza
-                    playerBase = new ArmyToken(getApplicationContext());
                     playerBase.setBackground(getDrawable(R.drawable.token_1));
                     //   playerBase.setContextClickable(getApplicationContext());
                     //  playerBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
@@ -181,14 +196,43 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     HexUtils.getToLobby(playerBase, 1);
                     viewGroup.addView(playerBase);
 
-                ArmyToken enemyBase = new ArmyToken(getApplicationContext());
-                enemyBase.setImageView(new ImageView(getApplicationContext()));
-                enemyBase.setBackground(getDrawable(R.drawable.token_1));
-                enemyBase.setLayoutParams(new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5));
-                HexUtils.setHexToBoard(listatest, enemyBase,2);
-                viewGroup.addView(enemyBase);
+                    ArmyToken enemyBase = new ArmyToken(getApplicationContext());
+                    enemyBase.setImageView(new ImageView(getApplicationContext()));
+                    enemyBase.setBackground(getDrawable(R.drawable.token_1));
+                    enemyBase.setLayoutParams(new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5));
+                    HexUtils.setHexToBoard(listatest, enemyBase, 2);
+                    viewGroup.addView(enemyBase);
                     playerBase.setOnTouchListener(onTouchListener(playerBase));
                 }
+
+                try
+                {
+                    SQLiteDatabase db;
+                    db = openOrCreateDatabase("Uczelnia", MODE_PRIVATE, null);
+                    ArrayList<String> wyniki = new ArrayList<String>();
+                    Cursor c = db.rawQuery("SELECT id, Imie, Nazwisko FROM STUDENCI", null);
+                    System.out.println("przed wywolaniem");
+                    if (c.moveToFirst()) {
+                        do {
+                            int id = c.getInt(c.getColumnIndexOrThrow("Id"));
+                            String imie = c.getString(c.getColumnIndexOrThrow("Imie"));
+                            String nazwisko = c.getString(c.getColumnIndexOrThrow("Nazwisko"));
+                            wyniki.add("Id:" + id + " Imię: " + imie + " Nazwisko:" + nazwisko);
+                        } while (c.moveToNext());
+                    }
+                    System.out.println("Wyszlo z petlo");
+                    for (String wynik : wyniki) {
+                        System.out.println(wynik);
+                    }
+                    db.close();
+                    c.close();
+                }
+                catch (Exception e) {
+
+                }
+
+
+
                 break;
 
         }
@@ -219,11 +263,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     case MotionEvent.ACTION_UP:
                         System.out.println("ACTION_UP");
                         int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
-                       boolean confirmed =  tokenG.confirmPositionToken(viewGroup,getApplicationContext(),tokenG,listatest,idPola);
-                        if (confirmed)
-                        {
-                            startActivity(new Intent(TutorialActivity.this,TutorialActivity2.class));
-                        }
+                        tokenG.confirmPositionToken(viewGroup, getApplicationContext(), tokenG, listatest, idPola);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         System.out.println("ACTION_MOVE");
@@ -244,6 +284,5 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
             }
         };
     }
-
 
 }

@@ -6,6 +6,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,14 +19,20 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.widget.Button;
 
+import com.example.pracainzynierska.commons.ArmyTokenUtils;
 import com.example.pracainzynierska.databinding.ActivityMenuBinding;
+import com.example.pracainzynierska.model.ArmyToken;
+import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
+
+import java.io.ByteArrayOutputStream;
+import java.sql.Statement;
+import java.util.List;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
-
 
 
     private Button tutorialButton;
@@ -79,7 +91,9 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         mContentView = binding.tutorial;
         tutorialButton = findViewById(R.id.tutorial);
         tutorialButton.setOnClickListener(this);
+        initDatabase();
     }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -90,6 +104,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         // are available.
         delayedHide(100);
     }
+
     private void hide() {
         // Hide UI first
         ActionBar actionBar = getSupportActionBar();
@@ -117,11 +132,48 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(MenuActivity.this, TutorialActivity.class));
                 finish();
                 break;
-
             case R.id.game:
-
                 break;
+        }
+    }
 
+
+    SQLiteDatabase db;
+    ArmyTokenUtils armyTokenUtils = new ArmyTokenUtils();
+
+    //todo jp zmienic baze danych i tabele gdzy nie bedize juz testu
+    private void initDatabase() {
+        db = openOrCreateDatabase("PracaInzynierskaTest", MODE_PRIVATE, null);
+        String sqlDB = "CREATE TABLE IF NOT EXISTS" +
+                " ARMY_TOKENS_TEST (Id INTEGER, name VARCHAR, " +
+                "initiative INTEGER,life INTEGER,image BLOB,ARMY_OWNER_ID INTEGER)";
+        db.execSQL(sqlDB);
+        String sqlCount = "SELECT count(*) FROM ARMY_TOKENS_TEST";
+        Cursor cursor = db.rawQuery(sqlCount, null);
+        cursor.moveToFirst();
+        int ilosc = cursor.getInt(0);
+        cursor.close();
+        if (ilosc == 0) {
+            String sqlStudent = "INSERT INTO ARMY_TOKENS_TEST VALUES (?,?,?,?,?,?)";
+            SQLiteStatement statement = db.compileStatement(sqlStudent);
+            List<ArmyTokenDto> armyHumanTokens = armyTokenUtils.initHumanArmy(getApplicationContext());
+            addToDAtabaseArmyToken(armyHumanTokens, statement);
+        }
+    }
+
+    private void addToDAtabaseArmyToken(List<ArmyTokenDto> armyTokenDtoList, SQLiteStatement statement) {
+        for (ArmyTokenDto tokenDto : armyTokenDtoList) {
+            statement.bindLong(1, tokenDto.getId());
+            statement.bindString(2, tokenDto.getName());
+            statement.bindLong(3, tokenDto.getInitiative());
+            statement.bindLong(4, tokenDto.getLife());
+            Bitmap bitmap = ((BitmapDrawable) tokenDto.getImgToDatabase()).getBitmap();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] bitmapdata = stream.toByteArray();
+            statement.bindBlob(5, bitmapdata);
+            statement.bindLong(6, tokenDto.getArmyOwnerId());
+            statement.executeInsert();
         }
     }
 }

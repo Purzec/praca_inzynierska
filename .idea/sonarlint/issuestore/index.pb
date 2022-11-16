@@ -26,9 +26,11 @@ z
 Japp/src/main/java/com/example/pracainzynierska/model/enums/AttackType.java,b\e\bebd4945dd1bf8a3c9991fa367e40f8ac8d82299
 @
 app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
-P
- app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
-u
-Eapp/src/main/java/com/example/pracainzynierska/TutorialActivity2.java,3\b\3b21ab83c4afcde91a072d1817b57b1682c9b776
 w
 Gapp/src/main/java/com/example/pracainzynierska/model/view/HexBoard.java,7\2\72ef78cbf2f21ef503dabf8844307e2a586bec3a
+z
+Japp/src/main/java/com/example/pracainzynierska/model/enums/Directions.java,3\f\3f65676007bc8ab92b8252e36c79beac3046f4e8
+p
+@app/src/main/java/com/example/pracainzynierska/model/Attack.java,e\b\ebd572bb8b71314c99d59aaacea6bf7fcf0a9729
+z
+Japp/src/main/java/com/example/pracainzynierska/commons/ArmyTokenUtils.java,1\7\17f46aad5ded701a70ef6cd749b20d5ee5467904

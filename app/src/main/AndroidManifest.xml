@@ -12,6 +12,7 @@
             android:name=".TutorialActivity2"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
+            android:screenOrientation="landscape"
             android:label="@string/title_activity_tutorial2"
             android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
         <activity

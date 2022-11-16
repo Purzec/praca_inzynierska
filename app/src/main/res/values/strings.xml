@@ -6,5 +6,6 @@
     <string name="game">Graj</string>
     <string name="title_activity_tutorial">TutorialActivity</string>
     <string name="close">Zamknij</string>
+    <string name="accept">AKCEPTUJ</string>
     <string name="title_activity_tutorial2">TutorialActivity2</string>
 </resources>

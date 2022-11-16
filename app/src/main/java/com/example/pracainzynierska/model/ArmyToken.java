@@ -172,7 +172,7 @@ public class ArmyToken extends View {
             @Override
             public void onClick(View view) {
                 // przesun armyTOken na pozycje poczatkową do wolnego slotu w lobby
-                HexUtils.getToLobby(armyToken, 1);
+                HexUtils.setToLobby(armyToken, 1);
                 viewGroup.removeView(ok);
                 viewGroup.removeView(no);
             }

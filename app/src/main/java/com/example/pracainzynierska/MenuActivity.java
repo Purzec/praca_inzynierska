@@ -92,6 +92,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         tutorialButton = findViewById(R.id.tutorial);
         tutorialButton.setOnClickListener(this);
         initDatabase();
+        System.out.println("weslzo");
     }
 
 
@@ -169,7 +170,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
             statement.bindLong(4, tokenDto.getLife());
             Bitmap bitmap = ((BitmapDrawable) tokenDto.getImgToDatabase()).getBitmap();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] bitmapdata = stream.toByteArray();
             statement.bindBlob(5, bitmapdata);
             statement.bindLong(6, tokenDto.getArmyOwnerId());

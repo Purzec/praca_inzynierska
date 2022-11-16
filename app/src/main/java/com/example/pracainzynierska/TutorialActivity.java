@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.view.MotionEventCompat;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -15,16 +14,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -61,14 +57,10 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
-            // Delayed removal of status and navigation bar
             if (Build.VERSION.SDK_INT >= 30) {
                 mContentView.getWindowInsetsController().hide(
                         WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
             } else {
-                // Note that some of these constants are new as of API 16 (Jelly Bean)
-                // and API 19 (KitKat). It is safe to use them, as they are inlined
-                // at compile-time and do nothing on earlier devices.
                 mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -193,21 +185,20 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     //  playerBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
                     ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
                     playerBase.setLayoutParams(lp);
-                    HexUtils.getToLobby(playerBase, 1);
+                    HexUtils.setToLobby(playerBase, 1);
                     viewGroup.addView(playerBase);
 
                     ArmyToken enemyBase = new ArmyToken(getApplicationContext());
                     enemyBase.setImageView(new ImageView(getApplicationContext()));
-                    enemyBase.setBackground(getDrawable(R.drawable.token_1));
+                    enemyBase.setBackground(getDrawable(R.drawable.lucznik));
                     enemyBase.setLayoutParams(new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5));
                     HexUtils.setHexToBoard(listatest, enemyBase, 2);
                     viewGroup.addView(enemyBase);
                     playerBase.setOnTouchListener(onTouchListener(playerBase));
                 }
 
-                try
-                {
-                    SQLiteDatabase db;
+                SQLiteDatabase db = null;
+                try {
                     db = openOrCreateDatabase("Uczelnia", MODE_PRIVATE, null);
                     ArrayList<String> wyniki = new ArrayList<String>();
                     Cursor c = db.rawQuery("SELECT id, Imie, Nazwisko FROM STUDENCI", null);
@@ -226,11 +217,11 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     }
                     db.close();
                     c.close();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
 
+                } finally {
+                    db.close();
                 }
-
 
 
                 break;

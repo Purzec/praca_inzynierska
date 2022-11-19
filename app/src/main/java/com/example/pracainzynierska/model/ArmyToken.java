@@ -6,10 +6,12 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.example.pracainzynierska.R;
 import com.example.pracainzynierska.commons.HexUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 import lombok.Data;
@@ -57,6 +59,25 @@ public class ArmyToken extends View {
      */
     private Drawable imgToDatabase;
 
+    /**
+     * Czy wybralismy token na drafcie
+     */
+    private boolean draftDiscard = false;
+
+
+    /**
+     * ikona obrazka X
+     */
+    private Drawable cancelDrawable;
+
+
+    public Drawable getCancelDrawable() {
+        return cancelDrawable;
+    }
+
+    public void setCancelDrawable(Drawable cancelDrawable) {
+        this.cancelDrawable = cancelDrawable;
+    }
 
     private boolean onBoard = false;
 
@@ -130,6 +151,13 @@ public class ArmyToken extends View {
     }
 
 
+    public boolean isDraftDiscard() {
+        return draftDiscard;
+    }
+
+    public void setDraftDiscard(boolean draftDiscard) {
+        this.draftDiscard = draftDiscard;
+    }
 
     public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola) {
 // pobierz rozmiary ekrany
@@ -172,13 +200,13 @@ public class ArmyToken extends View {
             @Override
             public void onClick(View view) {
                 // przesun armyTOken na pozycje poczatkową do wolnego slotu w lobby
-                HexUtils.setToLobby(armyToken, 1);
+                HexUtils.setToLobby(Arrays.asList(armyToken),viewGroup,hexList,context);
                 viewGroup.removeView(ok);
                 viewGroup.removeView(no);
             }
         });
 
-return armyToken.isOnBoard();
+        return armyToken.isOnBoard();
 
     }
 }

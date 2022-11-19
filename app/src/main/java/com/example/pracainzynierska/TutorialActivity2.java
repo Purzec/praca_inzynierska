@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,13 +16,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -31,10 +28,12 @@ import com.example.pracainzynierska.commons.HexUtils;
 import com.example.pracainzynierska.databinding.ActivityTutorial2Binding;
 import com.example.pracainzynierska.model.ArmyToken;
 import com.example.pracainzynierska.model.Hex;
+import com.example.pracainzynierska.model.gameStatus.Player;
 import com.example.pracainzynierska.model.view.HexBoard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -49,15 +48,18 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
     private RelativeLayout imgWithButton;
     private RelativeLayout draft;
     private Button button;
+    private Button acceptButton;
     private ImageButton infoButton;
     private ImageButton nextButton;
     private ArmyToken playerBase;
-    private ViewGroup viewGroup;
-    private HexBoard hexBoard;
     private ArrayList<Hex> listatest;
+    private ViewGroup viewGroup;
+    private ViewGroup relativeLayout;
+    private HexBoard hexBoard;
     private int etap = 1;
     private int bylo = 0;
     private View mControlsView;
+    private Player player = new Player();
     SQLiteDatabase db;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -104,9 +106,12 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
         binding = ActivityTutorial2Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         mContentView = binding.RelativeLayout1;
+        relativeLayout = findViewById(R.id.RelativeLayout1);
         mVisible = true;
         button = findViewById(R.id.closeButton);
         button.setOnClickListener(this);
+        hexBoard = findViewById(R.id.hexBoard);
+        listatest = hexBoard.pobierzKordy();
     }
 
     @Override
@@ -157,8 +162,25 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                 if (playerBase.isOnBoard()) {
                     //      startActivity(new Intent(TutorialActivity.this, TutorialActivity2.class));
                 } else {
-                    Toast.makeText(getApplicationContext(), "Postaw najpierw żeton na planszy", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Postaw najpierw żeton na planszy", Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case R.id.acceptDraft:
+//sprawdzamy czy odrzucił jeden token conajmniej
+                if (player.getDraft().stream().allMatch(ArmyToken::isDraftDiscard)) {
+                    Toast.makeText(getApplicationContext(), "KLIKNĄŁEŚ WSZYSTKIE TOKENY CONAJMNIEJ JEDEN MUSISZ DOBRAĆ", Toast.LENGTH_SHORT).show();
+                } else if (player.getDraft().stream().anyMatch(ArmyToken::isDraftDiscard)) {
+                    //  draft.setVisibility(View.GONE);
+                    //dodaj do lobby
+                    player.setLobby(player.getDraft().stream().filter(armyToken -> !armyToken.isDraftDiscard()).collect(Collectors.toList()));
+                    Toast.makeText(getApplicationContext(), String.valueOf(player.getLobby().size()), Toast.LENGTH_SHORT).show();
+                    player.getDraft().stream().forEach(armyToken -> draft.removeView(armyToken));
+                    HexUtils.setToLobby(player.getLobby(), relativeLayout,listatest,getApplicationContext());
+                    draft.setVisibility(View.GONE);
+                } else if (player.getDraft().stream().noneMatch(ArmyToken::isDraftDiscard)) {
+                    Toast.makeText(getApplicationContext(), "MUSISZ ODRZUCIĆ CONAJMNIEJ JEDEN TOKEN", Toast.LENGTH_SHORT).show();
+                }
+
                 break;
         }
     }
@@ -185,8 +207,9 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                         byte[] image = c.getBlob(c.getColumnIndexOrThrow("image"));
                         Bitmap bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
                         Drawable drawable = new BitmapDrawable(getResources(), bmp);
+                        armyToken.setCancelDrawable(getDrawable(R.drawable.cancel));
                         armyToken.setImgToDatabase(drawable);
-                        armyToken.setLayoutParams(new ViewGroup.LayoutParams((int) (mContentView.getWidth() *0.20), (int) (mContentView.getHeight() * 0.40)));
+                        armyToken.setLayoutParams(new ViewGroup.LayoutParams((int) (mContentView.getWidth() * 0.20), (int) (mContentView.getHeight() * 0.40)));
                         tokensPlayer.add(armyToken);
                     } while (c.moveToNext());
                 }
@@ -194,9 +217,12 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                 c.close();
                 //pobralismy tokenów do listy
                 //pobieramy widok na jakim mielisby się znaleźć
+                acceptButton = findViewById(R.id.acceptDraft);
+                acceptButton.setOnClickListener(this);
                 draft.setVisibility(View.VISIBLE);
                 // pobieramy do 3 tokenów zaleznie od tego ile jest w lobby z listy dostepnych
-                HexUtils.setToDraft(3, tokensPlayer, new ArrayList<>(), draft);
+                player.setDraft(HexUtils.setToDraft(3, tokensPlayer, new ArrayList<>(), draft));
+
 
 
                 /*1.pobranie zasobów obu graczy

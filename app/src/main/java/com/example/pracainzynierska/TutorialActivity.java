@@ -31,6 +31,7 @@ import com.example.pracainzynierska.model.Hex;
 import com.example.pracainzynierska.model.view.HexBoard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class TutorialActivity extends AppCompatActivity implements View.OnClickListener {
@@ -185,8 +186,8 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     //  playerBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
                     ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
                     playerBase.setLayoutParams(lp);
-                    HexUtils.setToLobby(playerBase, 1);
-                    viewGroup.addView(playerBase);
+                    HexUtils.setToLobby(Arrays.asList(playerBase),viewGroup,listatest,getApplicationContext());
+                  //  viewGroup.addView(playerBase);
 
                     ArmyToken enemyBase = new ArmyToken(getApplicationContext());
                     enemyBase.setImageView(new ImageView(getApplicationContext()));
@@ -196,34 +197,6 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     viewGroup.addView(enemyBase);
                     playerBase.setOnTouchListener(onTouchListener(playerBase));
                 }
-
-                SQLiteDatabase db = null;
-                try {
-                    db = openOrCreateDatabase("Uczelnia", MODE_PRIVATE, null);
-                    ArrayList<String> wyniki = new ArrayList<String>();
-                    Cursor c = db.rawQuery("SELECT id, Imie, Nazwisko FROM STUDENCI", null);
-                    System.out.println("przed wywolaniem");
-                    if (c.moveToFirst()) {
-                        do {
-                            int id = c.getInt(c.getColumnIndexOrThrow("Id"));
-                            String imie = c.getString(c.getColumnIndexOrThrow("Imie"));
-                            String nazwisko = c.getString(c.getColumnIndexOrThrow("Nazwisko"));
-                            wyniki.add("Id:" + id + " Imię: " + imie + " Nazwisko:" + nazwisko);
-                        } while (c.moveToNext());
-                    }
-                    System.out.println("Wyszlo z petlo");
-                    for (String wynik : wyniki) {
-                        System.out.println(wynik);
-                    }
-                    db.close();
-                    c.close();
-                } catch (Exception e) {
-
-                } finally {
-                    db.close();
-                }
-
-
                 break;
 
         }
@@ -235,8 +208,6 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
     private int yDelta;
 
     private View.OnTouchListener onTouchListener(ArmyToken tokenG) {
-
-
         return new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
             @Override
@@ -265,8 +236,8 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                         layoutParams.rightMargin = 0;
                         layoutParams.bottomMargin = 0;
                         //pobrac srodek obrazka
-                        playerBase.setX(x - playerBase.getWidth());
-                        playerBase.setY(y - playerBase.getHeight() / 2);
+                        tokenG.setX(x - tokenG.getWidth());
+                        tokenG.setY(y - tokenG.getHeight() / 2);
                         view.setLayoutParams(layoutParams);
                         break;
                 }

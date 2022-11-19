@@ -1,8 +1,15 @@
 package com.example.pracainzynierska.commons;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.Context;
 import android.content.res.Resources;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.pracainzynierska.model.ArmyToken;
 import com.example.pracainzynierska.model.Hex;
@@ -26,46 +33,58 @@ public class HexUtils extends Application {
     }
 
     //3,
-    public static ArmyToken setToLobby(ArmyToken imageView, int slot) {
-        float centerHeightImageView = imageView.getLayoutParams().height / 2;
-        float centerWidthImageView = imageView.getLayoutParams().width / 2;
-
-        imageView.setX(systemWidth / 10 - centerWidthImageView);
-        switch (slot) {
-            case 1:
-                imageView.setY((float) (systemHeight * 0.80 - centerHeightImageView));
-                break;
-            case 2:
-                imageView.setY((float) (systemHeight * 0.60 - centerHeightImageView));
-                break;
-            case 3:
-                imageView.setY((float) (systemHeight * 0.40 - centerHeightImageView));
-                break;
+    public static void setToLobby(List<ArmyToken> armyTokens, ViewGroup relativeLayout,List<Hex> listatest,Context context) {
+        int slot = 0;
+        for (ArmyToken armyToken : armyTokens) {
+            armyToken.setLayoutParams(new ViewGroup.LayoutParams(relativeLayout.getWidth() / 10, relativeLayout.getHeight() / 5));
+            float centerHeightImageView = armyToken.getLayoutParams().height / 2;
+            float centerWidthImageView = armyToken.getLayoutParams().width / 2;
+            armyToken.setX(systemWidth / 10 - centerWidthImageView);
+            switch (slot) {
+                case 0:
+                    armyToken.setY((float) (systemHeight * 0.80 - centerHeightImageView));
+                    break;
+                case 1:
+                    armyToken.setY((float) (systemHeight * 0.60 - centerHeightImageView));
+                    break;
+                case 2:
+                    armyToken.setY((float) (systemHeight * 0.40 - centerHeightImageView));
+                    break;
+            }
+            slot++;
+            relativeLayout.addView(armyToken);
+            armyToken.setOnClickListener(null);
+            armyToken.setOnTouchListener(onTouchListener(armyToken,listatest,relativeLayout,context));
         }
-        return imageView;
     }
 
-    public static ArmyToken setToDraft(int selectableTokenQuantity, List<ArmyToken> armyTokensPool, List<ArmyToken> armyTokensdiscard, RelativeLayout lobby) {
+    public static List<ArmyToken> setToDraft(int selectableTokenQuantity, List<ArmyToken> armyTokensPool, List<ArmyToken> armyTokensdiscard, RelativeLayout lobby) {
         // pobierz ustaloną liczbę losowych tokenów do lobby
         List<ArmyToken> draftLobby = new ArrayList<>();
         for (int i = 0; i < selectableTokenQuantity; i++) {
             draftLobby.add(takeRandomObjectFromList(armyTokensPool));
         }
-        int i = 1;
-//uzyskalismy liste tokenów do pokazania w lobby
-//pobieramy rozmiary widoku na jakim mają się pojawić
 
-        //to statystyki lewego górnego rogu
-        float layoutX = lobby.getX();
-        float layoutY = lobby.getY();
-
-        int slot=1;
+        int slot = 1;
         for (ArmyToken armyToken : draftLobby) {
             armyToken.setBackground(armyToken.getImgToDatabase());
-            lobby.addView(setToDraftSlot(lobby,armyToken,slot));
+            //dodać plany jak kliklniesz
+            armyToken.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (armyToken.isDraftDiscard()) {
+                        armyToken.setDraftDiscard(false);
+                        armyToken.setBackground(armyToken.getImgToDatabase());
+                    } else {
+                        armyToken.setDraftDiscard(true);
+                        armyToken.setBackground(armyToken.getCancelDrawable());
+                    }
+                }
+            });
+            lobby.addView(setToDraftSlot(lobby, armyToken, slot));
             slot++;
         }
-        return null;
+        return draftLobby;
     }
 
 
@@ -108,7 +127,7 @@ public class HexUtils extends Application {
     }
 
 
-    private static ArmyToken setToDraftSlot(RelativeLayout relativeLayout,ArmyToken armyToken, int slot) {
+    private static ArmyToken setToDraftSlot(RelativeLayout relativeLayout, ArmyToken armyToken, int slot) {
         float layoutX = relativeLayout.getX();
         float layoutY = relativeLayout.getY();
         switch (slot) {
@@ -128,5 +147,45 @@ public class HexUtils extends Application {
                 break;
         }
         return armyToken;
+    }
+
+
+    private static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context) {
+
+        return new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                final int x = (int) event.getRawX();
+                final int y = (int) event.getRawY();
+                ConstraintLayout.LayoutParams lParams = (ConstraintLayout.LayoutParams)
+                        view.getLayoutParams();
+                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                    case MotionEvent.ACTION_DOWN:
+                        System.out.println("ACTION_DOWN");
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        System.out.println("ACTION_UP");
+                        int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
+                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, listatest, idPola);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        System.out.println("ACTION_MOVE");
+                        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view
+                                .getLayoutParams();
+                        layoutParams.startToEnd = x - x - lParams.leftMargin;
+                        layoutParams.topToBottom = y -  y - lParams.topMargin;
+                        layoutParams.rightMargin = 0;
+                        layoutParams.bottomMargin = 0;
+                        //pobrac srodek obrazka
+                        tokenG.setX(x - tokenG.getWidth());
+                        tokenG.setY(y - tokenG.getHeight() / 2);
+                        view.setLayoutParams(layoutParams);
+                        break;
+                }
+                viewGroup.invalidate();
+                return true;
+            }
+        };
     }
 }

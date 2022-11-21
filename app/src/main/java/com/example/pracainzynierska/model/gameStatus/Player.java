@@ -2,6 +2,7 @@ package com.example.pracainzynierska.model.gameStatus;
 
 import com.example.pracainzynierska.model.ArmyToken;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
@@ -57,4 +58,7 @@ public class Player {
         return 3- lobby.size();
     }
 
+    public Player() {
+        this.lobby = new ArrayList<>();
+    }
 }

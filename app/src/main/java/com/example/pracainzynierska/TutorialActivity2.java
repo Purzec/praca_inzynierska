@@ -175,7 +175,7 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                     player.setLobby(player.getDraft().stream().filter(armyToken -> !armyToken.isDraftDiscard()).collect(Collectors.toList()));
                     Toast.makeText(getApplicationContext(), String.valueOf(player.getLobby().size()), Toast.LENGTH_SHORT).show();
                     player.getDraft().stream().forEach(armyToken -> draft.removeView(armyToken));
-                    HexUtils.setToLobby(player.getLobby(), relativeLayout,listatest,getApplicationContext());
+                    HexUtils.setToLobby(player.getLobby(), relativeLayout,listatest,getApplicationContext(),player);
                     draft.setVisibility(View.GONE);
                 } else if (player.getDraft().stream().noneMatch(ArmyToken::isDraftDiscard)) {
                     Toast.makeText(getApplicationContext(), "MUSISZ ODRZUCIĆ CONAJMNIEJ JEDEN TOKEN", Toast.LENGTH_SHORT).show();
@@ -223,13 +223,6 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                 // pobieramy do 3 tokenów zaleznie od tego ile jest w lobby z listy dostepnych
                 player.setDraft(HexUtils.setToDraft(3, tokensPlayer, new ArrayList<>(), draft));
 
-
-
-                /*1.pobranie zasobów obu graczy
-                 * 2.zrobienie widoku z 3 tokenami
-                 * 3. zrobienie opcji zaznaczania tokenów
-                 * 4.przypisanie im X znaczka ze chcemy go dorzucic
-                 * */
 
 
                 break;

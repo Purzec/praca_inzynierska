@@ -28,6 +28,7 @@ import com.example.pracainzynierska.commons.HexUtils;
 import com.example.pracainzynierska.databinding.ActivityTutorialBinding;
 import com.example.pracainzynierska.model.ArmyToken;
 import com.example.pracainzynierska.model.Hex;
+import com.example.pracainzynierska.model.gameStatus.Player;
 import com.example.pracainzynierska.model.view.HexBoard;
 
 import java.util.ArrayList;
@@ -178,6 +179,8 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         switch (etap) {
             case 1:
                 if (bylo == 0) {
+                    Player player = new Player();
+                    player.setLobby(Arrays.asList(playerBase));
                     bylo++;
                     //dodac sprawdzenie czy juz było wywołane todo jp
                     //dodanie tokenu bazy gracza
@@ -186,8 +189,9 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     //  playerBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
                     ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
                     playerBase.setLayoutParams(lp);
-                    HexUtils.setToLobby(Arrays.asList(playerBase),viewGroup,listatest,getApplicationContext());
-                  //  viewGroup.addView(playerBase);
+                    playerBase.setLobbySlot(0);
+                    viewGroup.addView(playerBase);
+                    HexUtils.goToLobbySlot(playerBase);
 
                     ArmyToken enemyBase = new ArmyToken(getApplicationContext());
                     enemyBase.setImageView(new ImageView(getApplicationContext()));
@@ -195,7 +199,9 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     enemyBase.setLayoutParams(new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5));
                     HexUtils.setHexToBoard(listatest, enemyBase, 2);
                     viewGroup.addView(enemyBase);
-                    playerBase.setOnTouchListener(onTouchListener(playerBase));
+                    System.out.println("ACTION_UP");
+
+                    playerBase.setOnTouchListener(onTouchListener(playerBase,player));
                 }
                 break;
 
@@ -207,7 +213,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
     private int xDelta;
     private int yDelta;
 
-    private View.OnTouchListener onTouchListener(ArmyToken tokenG) {
+    private View.OnTouchListener onTouchListener(ArmyToken tokenG,Player player) {
         return new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
             @Override
@@ -223,9 +229,8 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                         yDelta = y - lParams.topMargin;
                         break;
                     case MotionEvent.ACTION_UP:
-                        System.out.println("ACTION_UP");
                         int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
-                        tokenG.confirmPositionToken(viewGroup, getApplicationContext(), tokenG, listatest, idPola);
+                        tokenG.confirmPositionToken(viewGroup, getApplicationContext(), tokenG, listatest, idPola, player);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         System.out.println("ACTION_MOVE");

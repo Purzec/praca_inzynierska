@@ -6,12 +6,11 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.example.pracainzynierska.R;
 import com.example.pracainzynierska.commons.HexUtils;
+import com.example.pracainzynierska.model.gameStatus.Player;
 
-import java.util.Arrays;
 import java.util.List;
 
 import lombok.Data;
@@ -24,6 +23,7 @@ public class ArmyToken extends View {
 
     static float systemWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     static float systemHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+    static float rotationAngle = 60;
 
     /**
      * Id zetonu
@@ -66,10 +66,37 @@ public class ArmyToken extends View {
 
 
     /**
+     * Liczba obrotów tokenu
+     */
+    private int rotationQuantity = 0;
+
+
+    /**
      * ikona obrazka X
      */
     private Drawable cancelDrawable;
 
+    /**
+     * Slot w lobby
+     */
+    private int lobbySlot;
+
+
+    public int getLobbySlot() {
+        return lobbySlot;
+    }
+
+    public void setLobbySlot(int lobbySlot) {
+        this.lobbySlot = lobbySlot;
+    }
+
+    public int getRotationQuantity() {
+        return rotationQuantity;
+    }
+
+    public void setRotationQuantity(int rotationQuantity) {
+        this.rotationQuantity = rotationQuantity;
+    }
 
     public Drawable getCancelDrawable() {
         return cancelDrawable;
@@ -159,13 +186,65 @@ public class ArmyToken extends View {
         this.draftDiscard = draftDiscard;
     }
 
-    public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola) {
+    public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola, Player player) {
 // pobierz rozmiary ekrany
-        armyToken.setOnTouchListener(null);
+        //dodać przyciski obrotu ekranu
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
+        ImageView leftArrow = new ImageView(context);
+        leftArrow.setImageDrawable(context.getDrawable(R.drawable.arrow));
+        leftArrow.setLayoutParams(lp);
+        float centerHeightLeftArrow = leftArrow.getLayoutParams().height / 2;
+        float centerWidthLeftArrow = leftArrow.getLayoutParams().width / 2;
+
+
+        ImageView rightArrow = new ImageView(context);
+        rightArrow.setImageDrawable(context.getDrawable(R.drawable.arrow_right));
+        rightArrow.setLayoutParams(lp);
+        float centerHeightRightArrow = rightArrow.getLayoutParams().height / 2;
+        float centerWidthRightArrow = rightArrow.getLayoutParams().width / 2;
+
+
+        leftArrow.setX((float) (systemWidth * 0.80 - centerWidthLeftArrow));
+        leftArrow.setY((float) (systemHeight * 0.65 - centerHeightLeftArrow));
+        rightArrow.setX((float) (systemWidth * 0.95 - centerWidthRightArrow));
+        rightArrow.setY((float) (systemHeight * 0.65 - centerHeightRightArrow));
+
+        leftArrow.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //klikniecie powoduje obrót
+                float awialableRotation = armyToken.getRotation();
+                armyToken.setRotation(awialableRotation - rotationAngle);
+                rotationQuantity--;
+                if (rotationQuantity < 0) {
+                    rotationQuantity = 5;
+                }
+
+                System.out.println(armyToken.getRotationQuantity());
+            }
+        });
+
+        rightArrow.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                float awialableRotation = armyToken.getRotation();
+                armyToken.setRotation(awialableRotation + rotationAngle);
+                rotationQuantity++;
+                if (rotationQuantity > 5) {
+                    rotationQuantity = 0;
+                }
+                System.out.println(armyToken.getRotationQuantity());
+            }
+        });
+
+        viewGroup.addView(leftArrow);
+        viewGroup.addView(rightArrow);
+
+
+
         ImageView ok = new ImageView(context);
         ok.setImageDrawable(context.getDrawable(R.drawable.ok));
-        ViewGroup.LayoutParams lpOk = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
-        ok.setLayoutParams(lpOk);
+        ok.setLayoutParams(lp);
 
         float centerHeightImageViewOk = ok.getLayoutParams().height / 2;
         float centerWidthImageViewOk = ok.getLayoutParams().width / 2;
@@ -175,8 +254,7 @@ public class ArmyToken extends View {
 
         ImageView no = new ImageView(context);
         no.setImageDrawable(context.getDrawable(R.drawable.no));
-        ViewGroup.LayoutParams lpNo = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
-        no.setLayoutParams(lpNo);
+        no.setLayoutParams(lp);
 
         float centerHeightImageViewNo = no.getLayoutParams().height / 2;
         float centerWidthImageViewNo = no.getLayoutParams().width / 2;
@@ -191,6 +269,8 @@ public class ArmyToken extends View {
                 hexList.get(idPola).setArmyToken(armyToken);
                 viewGroup.removeView(ok);
                 viewGroup.removeView(no);
+                viewGroup.removeView(leftArrow);
+                viewGroup.removeView(rightArrow);
                 armyToken.setOnTouchListener(null);
                 armyToken.setOnBoard(true);
             }
@@ -200,9 +280,12 @@ public class ArmyToken extends View {
             @Override
             public void onClick(View view) {
                 // przesun armyTOken na pozycje poczatkową do wolnego slotu w lobby
-                HexUtils.setToLobby(Arrays.asList(armyToken),viewGroup,hexList,context);
                 viewGroup.removeView(ok);
                 viewGroup.removeView(no);
+                viewGroup.removeView(leftArrow);
+                viewGroup.removeView(rightArrow);
+                HexUtils.goToLobbySlot(armyToken);
+                armyToken.setOnTouchListener(HexUtils.onTouchListener(armyToken,hexList,viewGroup,context,player));
             }
         });
 

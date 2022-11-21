@@ -13,8 +13,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.pracainzynierska.model.ArmyToken;
 import com.example.pracainzynierska.model.Hex;
+import com.example.pracainzynierska.model.gameStatus.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -33,8 +35,9 @@ public class HexUtils extends Application {
     }
 
     //3,
-    public static void setToLobby(List<ArmyToken> armyTokens, ViewGroup relativeLayout,List<Hex> listatest,Context context) {
+    public static void setToLobby(List<ArmyToken> armyTokens, ViewGroup relativeLayout, List<Hex> listatest, Context context,Player player) {
         int slot = 0;
+
         for (ArmyToken armyToken : armyTokens) {
             armyToken.setLayoutParams(new ViewGroup.LayoutParams(relativeLayout.getWidth() / 10, relativeLayout.getHeight() / 5));
             float centerHeightImageView = armyToken.getLayoutParams().height / 2;
@@ -42,19 +45,22 @@ public class HexUtils extends Application {
             armyToken.setX(systemWidth / 10 - centerWidthImageView);
             switch (slot) {
                 case 0:
+                    armyToken.setLobbySlot(0);
                     armyToken.setY((float) (systemHeight * 0.80 - centerHeightImageView));
                     break;
                 case 1:
+                    armyToken.setLobbySlot(1);
                     armyToken.setY((float) (systemHeight * 0.60 - centerHeightImageView));
                     break;
                 case 2:
+                    armyToken.setLobbySlot(2);
                     armyToken.setY((float) (systemHeight * 0.40 - centerHeightImageView));
                     break;
             }
             slot++;
             relativeLayout.addView(armyToken);
             armyToken.setOnClickListener(null);
-            armyToken.setOnTouchListener(onTouchListener(armyToken,listatest,relativeLayout,context));
+            armyToken.setOnTouchListener(onTouchListener(armyToken,listatest,relativeLayout,context,player));
         }
     }
 
@@ -150,7 +156,7 @@ public class HexUtils extends Application {
     }
 
 
-    private static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context) {
+    public static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context,Player player) {
 
         return new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -167,7 +173,7 @@ public class HexUtils extends Application {
                     case MotionEvent.ACTION_UP:
                         System.out.println("ACTION_UP");
                         int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
-                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, listatest, idPola);
+                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, listatest, idPola,player);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         System.out.println("ACTION_MOVE");
@@ -188,4 +194,23 @@ public class HexUtils extends Application {
             }
         };
     }
+
+    public static void goToLobbySlot(ArmyToken armyToken) {
+        float centerHeightImageView = armyToken.getLayoutParams().height / 2;
+        float centerWidthImageView = armyToken.getLayoutParams().width / 2;
+        armyToken.setX(systemWidth / 10 - centerWidthImageView);
+        switch (armyToken.getLobbySlot()){
+                case 0:
+                    armyToken.setY((float) (systemHeight * 0.80 - centerHeightImageView));
+                    break;
+                case 1:
+                    armyToken.setY((float) (systemHeight * 0.60 - centerHeightImageView));
+                    break;
+                case 2:
+                    armyToken.setY((float) (systemHeight * 0.40 - centerHeightImageView));
+                    break;
+        }
+
+    }
+
 }

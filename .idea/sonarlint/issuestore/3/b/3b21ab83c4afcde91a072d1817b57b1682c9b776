@@ -1,0 +1,51 @@
+
+>
+java:S1604R"(Make this anonymous inner class a lambda(œï±Ì
+C
+java:S1604^"(Make this anonymous inner class a lambda(…ªÇ¼ıÿÿÿÿ
+g
+java:S1301¿"KReplace this "switch" statement by "if" statements to increase readability.(’ÁØ®şÿÿÿÿ
+v
+java:S14503"[Remove the "acceptButton" field and declare it as a local variable in the relevant methods.(Ôëôşÿÿÿÿ
+k
+java:S1450e"VRemove the "binding" field and declare it as a local variable in the relevant methods.(âïÃN
+k
+java:S14502"URemove the "button" field and declare it as a local variable in the relevant methods.(ÈòÉ¹
+r
+java:S1450:"WRemove the "hexBoard" field and declare it as a local variable in the relevant methods.(øâ¨·şÿÿÿÿ
+m
+java:S1450]"WRemove the "mVisible" field and declare it as a local variable in the relevant methods.(©œ€ñ
+S
+java:S1874H"=Remove this use of "setSystemUiVisibility"; it is deprecated.(ö¡â‚
+X
+java:S1874H"BRemove this use of "SYSTEM_UI_FLAG_LOW_PROFILE"; it is deprecated.(ö¡â‚
+\
+java:S1874I"ARemove this use of "SYSTEM_UI_FLAG_FULLSCREEN"; it is deprecated.(é•éàıÿÿÿÿ
+Z
+java:S1874J"DRemove this use of "SYSTEM_UI_FLAG_LAYOUT_STABLE"; it is deprecated.(«‘’Ä
+]
+java:S1874K"GRemove this use of "SYSTEM_UI_FLAG_IMMERSIVE_STICKY"; it is deprecated.(Íêµ˜
+h
+java:S1874L"MRemove this use of "SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION"; it is deprecated.(®Ü¢Òøÿÿÿÿ
+\
+java:S1874M"FRemove this use of "SYSTEM_UI_FLAG_HIDE_NAVIGATION"; it is deprecated.(–ö¸Ë
+8	java:S131“""Add a default case to this switch.(ºÖ
+O	java:S106›"9Replace this use of System.out or System.err by a logger.(»íÅÒ
+O	java:S106œ"9Replace this use of System.out or System.err by a logger.(å­„Ô
+R	java:S125£"<This block of commented-out lines of code should be removed.(Ë‹ûİ
+W	java:S125­"<This block of commented-out lines of code should be removed.(¢¼³Şüÿÿÿÿ
+I
+java:S1135½"2Complete the task associated to this TODO comment.(Òêõ§
+=	java:S131¿""Add a default case to this switch.(’ÁØ®şÿÿÿÿ
+Y
+java:S3398|">Move this method into the anonymous class declared at line 94.(¨½ÇÁûÿÿÿÿ
+C
+java:S1068+"-Remove this unused "AUTO_HIDE" private field.(‚Øÿ
+U
+java:S1068,":Remove this unused "AUTO_HIDE_DELAY_MILLIS" private field.(Æîå¼üÿÿÿÿ
+H
+java:S10688"-Remove this unused "viewGroup" private field.(è‘ïªøÿÿÿÿ
+>
+java:S1068<"(Remove this unused "bylo" private field.(Ü°¼
+B
+java:S1068]",Remove this unused "mVisible" private field.(©œ€ñ

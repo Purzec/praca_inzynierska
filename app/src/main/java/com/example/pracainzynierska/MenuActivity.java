@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,21 +20,20 @@ import android.widget.Button;
 
 import com.example.pracainzynierska.commons.ArmyTokenUtils;
 import com.example.pracainzynierska.databinding.ActivityMenuBinding;
-import com.example.pracainzynierska.model.ArmyToken;
+import com.example.pracainzynierska.model.Attack;
 import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
+import com.example.pracainzynierska.model.DTO.AttackDto;
 
 import java.io.ByteArrayOutputStream;
 import java.sql.Statement;
 import java.util.List;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
+
 public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     private Button tutorialButton;
+    private Button gameButton;
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
@@ -90,6 +88,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(binding.getRoot());
         mContentView = binding.tutorial;
         tutorialButton = findViewById(R.id.tutorial);
+        gameButton = findViewById(R.id.game);
+        gameButton.setOnClickListener(this);
         tutorialButton.setOnClickListener(this);
         initDatabase();
         System.out.println("weslzo");
@@ -134,6 +134,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
                 break;
             case R.id.game:
+                startActivity(new Intent(MenuActivity.this,LoginActivity.class));
                 break;
         }
     }
@@ -155,10 +156,36 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         int ilosc = cursor.getInt(0);
         cursor.close();
         if (ilosc == 0) {
-            String sqlStudent = "INSERT INTO ARMY_TOKENS_TEST VALUES (?,?,?,?,?,?)";
-            SQLiteStatement statement = db.compileStatement(sqlStudent);
-            List<ArmyTokenDto> armyHumanTokens = armyTokenUtils.initHumanArmy(getApplicationContext());
+            String sqlArmyToken = "INSERT INTO ARMY_TOKENS_TEST VALUES (?,?,?,?,?,?)";
+            SQLiteStatement statement = db.compileStatement(sqlArmyToken);
+            List<ArmyTokenDto> armyHumanTokens = armyTokenUtils.initElfArmy(getApplicationContext());
             addToDAtabaseArmyToken(armyHumanTokens, statement);
+        }
+
+        String sqlAttackList = "CREATE TABLE IF NOT EXISTS ARMY_ATTACK_TEST" +
+                " (ID Integer, TOKEN_ID INTEGER, ATTACK_TYPE VARCHAR, STRENGHT INTEGER, DIRECTIONS VARCHAR)";
+        db.execSQL(sqlAttackList);
+        String sqlCountArmyAttack = "SELECT count(*) FROM ARMY_ATTACK_TEST";
+        Cursor cursorArmyAttack = db.rawQuery(sqlCountArmyAttack, null);
+        cursorArmyAttack.moveToFirst();
+        int countArmyAttack = cursorArmyAttack.getInt(0);
+        cursorArmyAttack.close();
+        if (countArmyAttack == 0) {
+            String sqlArmyAttacks = "INSERT INTO ARMY_ATTACK_TEST VALUES(?,?,?,?,?)";
+            SQLiteStatement statementArmyAttacks = db.compileStatement(sqlArmyAttacks);
+            List<AttackDto> elfArmyAttack = armyTokenUtils.initElfArmyAttack();
+            addToDatabaseAttackToken(elfArmyAttack, statementArmyAttacks);
+        }
+    }
+
+    private void addToDatabaseAttackToken(List<AttackDto> elfArmyAttack, SQLiteStatement statement) {
+        for (AttackDto attackDto : elfArmyAttack) {
+            statement.bindLong(1, attackDto.getId());
+            statement.bindLong(2, attackDto.getTokenID());
+            statement.bindString(3, attackDto.getAttackType().name());
+            statement.bindLong(4, attackDto.getStrenght());
+            statement.bindString(5,attackDto.getDirections().name());
+            statement.executeInsert();
         }
     }
 

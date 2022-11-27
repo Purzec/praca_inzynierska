@@ -9,11 +9,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PracaInzynierska">
         <activity
+            android:name=".RegistryUser"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:label="@string/email"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
+        <activity
+            android:name=".LoginActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
+        <activity
             android:name=".TutorialActivity2"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
-            android:screenOrientation="landscape"
             android:label="@string/title_activity_tutorial2"
+            android:screenOrientation="landscape"
             android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
         <activity
             android:name=".TutorialActivity"

@@ -1,27 +1,25 @@
 package com.example.pracainzynierska.commons;
 
-import android.app.Application;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pracainzynierska.R;
-import com.example.pracainzynierska.model.ArmyToken;
 import com.example.pracainzynierska.model.Attack;
 import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
+import com.example.pracainzynierska.model.DTO.AttackDto;
 import com.example.pracainzynierska.model.enums.AttackType;
 import com.example.pracainzynierska.model.enums.Directions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class ArmyTokenUtils extends AppCompatActivity {
 
 
-    public List<ArmyTokenDto> initHumanArmy(Context context) {
+    public List<ArmyTokenDto> initElfArmy(Context context) {
 
         Drawable drawable = context.getApplicationContext().getDrawable(R.drawable.zwiadowca);
         Drawable drawable1 = context.getApplicationContext().getDrawable(R.drawable.lucznik);
@@ -50,4 +48,26 @@ public class ArmyTokenUtils extends AppCompatActivity {
     }
 
 
+    public List<AttackDto> initElfArmyAttack() {
+        AttackDto attack = new AttackDto(1,1, AttackType.SHORT, 1, Directions.FORWARD_LEFT);
+        AttackDto attack1 = new AttackDto(2, 2,AttackType.SHORT, 1, Directions.FORWARD_LEFT);
+        AttackDto attack2 = new AttackDto(3, 3,AttackType.LONG, 1, Directions.FORWARD);
+        AttackDto attack3 = new AttackDto(4, 4,AttackType.LONG, 1, Directions.FORWARD);
+        AttackDto attack4 = new AttackDto(5, 5,AttackType.LONG, 1, Directions.FORWARD);
+        AttackDto attack5 = new AttackDto(6, 6,AttackType.LONG, 1, Directions.FORWARD);
+        AttackDto attack6 = new AttackDto(7, 7,AttackType.LONG, 1, Directions.FORWARD);
+
+        List<AttackDto> attacks = new ArrayList<>();
+        attacks.add(attack);
+        attacks.add(attack1);
+        attacks.add(attack2);
+        attacks.add(attack3);
+        attacks.add(attack4);
+        attacks.add(attack5);
+        attacks.add(attack6);
+
+
+
+        return attacks;
+    }
 }

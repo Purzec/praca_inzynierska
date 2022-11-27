@@ -1,15 +1,9 @@
-package com.example.pracainzynierska.model;
+package com.example.pracainzynierska.model.DTO;
 
 import com.example.pracainzynierska.model.enums.AttackType;
 import com.example.pracainzynierska.model.enums.Directions;
 
-import lombok.Data;
-
-/**
- * Obiekt definiujący atakct jednostki
- */
-@Data
-public class Attack {
+public class AttackDto {
 
     /**
      * Id ataku w bazie danych
@@ -36,21 +30,6 @@ public class Attack {
      */
     private Directions directions;
 
-    public Attack(int id, AttackType attackType, int strenght, Directions directions) {
-        this.id = id;
-        this.attackType = attackType;
-        this.strenght = strenght;
-        this.directions = directions;
-    }
-
-    public Attack(int id, int tokenID, AttackType attackType, int strenght, Directions directions) {
-        this.id = id;
-        this.tokenID = tokenID;
-        this.attackType = attackType;
-        this.strenght = strenght;
-        this.directions = directions;
-    }
-
     public int getId() {
         return id;
     }
@@ -64,7 +43,7 @@ public class Attack {
     }
 
     public void setTokenID(int tokenID) {
-        tokenID = tokenID;
+        this.tokenID = tokenID;
     }
 
     public AttackType getAttackType() {
@@ -88,6 +67,14 @@ public class Attack {
     }
 
     public void setDirections(Directions directions) {
+        this.directions = directions;
+    }
+
+    public AttackDto(int id, int tokenID, AttackType attackType, int strenght, Directions directions) {
+        this.id = id;
+        this.tokenID = tokenID;
+        this.attackType = attackType;
+        this.strenght = strenght;
         this.directions = directions;
     }
 }

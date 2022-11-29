@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -86,7 +87,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(binding.getRoot());
         mControlsView = binding.layout;
         mContentView = binding.layout;
-
 
 
         register = findViewById(R.id.register);
@@ -155,8 +155,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    //todo jp zrobienie przeniesienia na ekran tworzenia pokoju
-                 //   startActivity(new Intent(LoginActivity.this, ProfileAcivity.class));
+                    FirebaseUser userBeforeVerification = FirebaseAuth.getInstance().getCurrentUser();
+                    if (userBeforeVerification.isEmailVerified()) {
+                        startActivity(new Intent(LoginActivity.this, TutorialActivity.class));
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Aktywuj swoje konto", Toast.LENGTH_SHORT).show();
+                     //   userBeforeVerification.sendEmailVerification();
+                    }
                 } else {
                     Toast.makeText(LoginActivity.this, "BAD CREDINTIAL", Toast.LENGTH_SHORT).show();
                 }

@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 /**
@@ -36,6 +37,7 @@ public class RegistryUser extends AppCompatActivity implements View.OnClickListe
     private TextView banner, registerUser;
     private EditText editTextNick, editTextAge, editTextEmail, editTextPassword;
     private ProgressBar progressBar;
+    private boolean createAccount = false;
 
     private FirebaseAuth mAuth;
 
@@ -184,18 +186,21 @@ public class RegistryUser extends AppCompatActivity implements View.OnClickListe
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            User user = new User(fullName,email);
+                        if (task.isSuccessful()) {
+                            User user = new User(fullName, email);
 
                             FirebaseDatabase.getInstance().getReference("Users")
                                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()){
-                                                Toast.makeText(RegistryUser.this, "User has been register succesfull", Toast.LENGTH_SHORT).show();
+                                            if (task.isSuccessful()) {
+                                                FirebaseUser userBeforeVerification = FirebaseAuth.getInstance().getCurrentUser();
+                                                userBeforeVerification.sendEmailVerification();
+                                                Toast.makeText(RegistryUser.this, "ZAREJESTROWANO, sprawdz skrzynkę pocztową i aktywuj konto", Toast.LENGTH_SHORT).show();
+                                                createAccount = true;
                                                 progressBar.setVisibility(View.GONE);
-                                            }else{
+                                            } else {
                                                 Toast.makeText(RegistryUser.this, "Failed register! Try again", Toast.LENGTH_SHORT).show();
                                                 progressBar.setVisibility(View.GONE);
                                             }

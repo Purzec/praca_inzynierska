@@ -9,6 +9,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PracaInzynierska">
         <activity
+            android:name=".ProfileActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
+        <activity
             android:name=".RegistryUser"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"

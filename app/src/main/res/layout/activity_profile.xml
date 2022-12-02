@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_main_menu"
+    android:orientation="vertical"
+    android:theme="@style/ThemeOverlay.PracaInzynierska.FullscreenContainer"
+    tools:context=".LoginActivity">
+
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/profile"
+        android:name="com.example.pracainzynierska.CreateRoomFragments"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

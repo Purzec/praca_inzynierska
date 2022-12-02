@@ -99,7 +99,8 @@ public class RegistryUser extends AppCompatActivity implements View.OnClickListe
         mVisible = true;
         mControlsView = binding.layout;
         mContentView = binding.layout;
-
+        banner = findViewById(R.id.gameName);
+        banner.setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -112,7 +113,6 @@ public class RegistryUser extends AppCompatActivity implements View.OnClickListe
         editTextPassword = findViewById(R.id.editTextTextPassword);
 
         progressBar = findViewById(R.id.progressBar);
-
 
 
     }
@@ -142,10 +142,10 @@ public class RegistryUser extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            /*case R.id.banner:
+            case R.id.gameName:
                 startActivity(new Intent(this, LoginActivity.class));
-                finish();// todo jp nie jestem pewien czy to konieczne
-                break;*/
+              //  finish();// todo jp nie jestem pewien czy to konieczne
+                break;
 
             case R.id.register:
                 registerUser();

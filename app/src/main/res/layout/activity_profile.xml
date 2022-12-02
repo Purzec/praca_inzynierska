@@ -11,8 +11,8 @@
 
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/profile"
-        android:name="com.example.pracainzynierska.CreateRoomFragments"
+        android:id="@+id/fragment_container"
+        android:name="com.example.pracainzynierska.model.fragments.CreateRoomFragments"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

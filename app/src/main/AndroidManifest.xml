@@ -16,20 +16,6 @@
             android:label="@string/title_activity_profile"
             android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
         <activity
-            android:name=".RegistryUser"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="false"
-            android:label="@string/email"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
-        <activity
-            android:name=".LoginActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="false"
-            android:label="@string/title_activity_login"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.PracaInzynierska.Fullscreen" />
-        <activity
             android:name=".TutorialActivity2"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"

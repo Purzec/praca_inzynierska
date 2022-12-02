@@ -23,17 +23,17 @@ import com.example.pracainzynierska.databinding.ActivityMenuBinding;
 import com.example.pracainzynierska.model.Attack;
 import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
 import com.example.pracainzynierska.model.DTO.AttackDto;
+import com.example.pracainzynierska.model.fragments.LoginFragment;
 
 import java.io.ByteArrayOutputStream;
 import java.sql.Statement;
 import java.util.List;
 
 
-public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
+public class MenuActivity extends AppCompatActivity{
 
 
-    private Button tutorialButton;
-    private Button gameButton;
+
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
@@ -86,13 +86,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
         binding = ActivityMenuBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        mContentView = binding.tutorial;
-        tutorialButton = findViewById(R.id.tutorial);
-        gameButton = findViewById(R.id.game);
-        gameButton.setOnClickListener(this);
-        tutorialButton.setOnClickListener(this);
+        mContentView = binding.menu;
         initDatabase();
-        System.out.println("weslzo");
     }
 
 
@@ -124,19 +119,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.tutorial:
-                startActivity(new Intent(MenuActivity.this, TutorialActivity.class));
-                finish();
-                break;
-            case R.id.game:
-                startActivity(new Intent(MenuActivity.this,LoginActivity.class));
-                break;
-        }
     }
 
 

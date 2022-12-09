@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 
 /**
@@ -165,6 +166,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
                                                 FirebaseUser userBeforeVerification = FirebaseAuth.getInstance().getCurrentUser();
+                                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(user.getNick()).build();
+                                                userBeforeVerification.updateProfile(profileUpdates);
                                                 userBeforeVerification.sendEmailVerification();
                                                 Toast.makeText(getContext(), "ZAREJESTROWANO, sprawdz skrzynkę pocztową i aktywuj konto", Toast.LENGTH_SHORT).show();
                                                 createAccount = true;

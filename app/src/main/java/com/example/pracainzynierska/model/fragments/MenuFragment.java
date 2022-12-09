@@ -85,15 +85,13 @@ public class MenuFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tutorial:
-              //  startActivity(new Intent(MenuActivity.this, TutorialActivity.class));
-                RoomList roomList = new RoomList();
+                TutorialFragment tutorialFragment = new TutorialFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, roomList, "findThisFragment")
+                        .replace(R.id.fragmentContainerView, tutorialFragment, "findThisFragment")
                         .addToBackStack(null)
                         .commit();
                 break;
             case R.id.game:
-            //    startActivity(new Intent(MenuActivity.this, LoginActivity.class));
                 LoginFragment loginFragment = new LoginFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainerView, loginFragment, "menuFragment")
@@ -102,5 +100,4 @@ public class MenuFragment extends Fragment implements View.OnClickListener {
                 break;
         }
     }
-
 }

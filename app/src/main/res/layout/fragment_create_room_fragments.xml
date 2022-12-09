@@ -16,7 +16,8 @@
         android:backgroundTint="@color/black_overlay"
         android:text="@string/logout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/white"/>
 
 
     <LinearLayout
@@ -29,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="69dp"
+            android:textColor="@color/white"
             android:text="Nazwa Użytkownika" />
         <TextView
             android:id="@+id/playerName"
@@ -49,7 +51,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/createRoom"
-            android:backgroundTint="@color/black_overlay"/>
+            android:backgroundTint="@color/black_overlay"
+            android:textColor="@color/white"/>
 
 
     </LinearLayout>

@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background_main_menu"
     android:orientation="vertical"
-    android:theme="@style/ThemeOverlay.PracaInzynierska.FullscreenContainer"
-    tools:context=".LoginActivity">
+    android:theme="@style/ThemeOverlay.PracaInzynierska.FullscreenContainer">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
@@ -58,7 +57,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/register"
-        android:backgroundTint="@color/black_overlay"/>
+        android:backgroundTint="@color/black_overlay"
+        android:textColor="@color/white"/>
 
     <ProgressBar
         android:id="@+id/progressBar"

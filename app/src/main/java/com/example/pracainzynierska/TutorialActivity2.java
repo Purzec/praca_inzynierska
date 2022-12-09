@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -112,6 +113,8 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
         button.setOnClickListener(this);
         hexBoard = findViewById(R.id.hexBoard);
         listatest = hexBoard.pobierzKordy();
+        nextButton = findViewById(R.id.nextButton);
+        nextButton.setOnClickListener(this);
     }
 
     @Override
@@ -159,11 +162,7 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                 imgWithButton.bringToFront();
                 break;
             case R.id.nextButton:
-                if (playerBase.isOnBoard()) {
-                    //      startActivity(new Intent(TutorialActivity.this, TutorialActivity2.class));
-                } else {
-                    Toast.makeText(getApplicationContext(), "Postaw najpierw żeton na planszy", Toast.LENGTH_SHORT).show();
-                }
+                          startActivity(new Intent(TutorialActivity2.this, MenuActivity.class));
                 break;
             case R.id.acceptDraft:
 //sprawdzamy czy odrzucił jeden token conajmniej

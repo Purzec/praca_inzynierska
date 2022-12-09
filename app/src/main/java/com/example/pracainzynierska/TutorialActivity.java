@@ -116,8 +116,6 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
 
         delayedHide(100);
         button = findViewById(R.id.closeButton);
-        infoButton = findViewById(R.id.infoButton);
-        infoButton.setOnClickListener(this);
         button.setOnClickListener(this);
         imgWithButton = findViewById(R.id.imgWithButton);
         viewGroup = findViewById(R.id.RelativeLayout1);

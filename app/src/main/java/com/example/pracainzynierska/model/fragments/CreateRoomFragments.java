@@ -11,9 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.pracainzynierska.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -22,15 +24,8 @@ import com.google.firebase.auth.FirebaseAuth;
  */
 public class CreateRoomFragments extends Fragment implements View.OnClickListener {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    Button button,createRoom;
+    Button button, createRoom;
+    private TextView textView;
 
     /**
      * Use this factory method to create a new instance of
@@ -44,8 +39,7 @@ public class CreateRoomFragments extends Fragment implements View.OnClickListene
     public static CreateRoomFragments newInstance(String param1, String param2) {
         CreateRoomFragments fragment = new CreateRoomFragments();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,10 +51,7 @@ public class CreateRoomFragments extends Fragment implements View.OnClickListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
 
     }
 
@@ -79,7 +70,9 @@ public class CreateRoomFragments extends Fragment implements View.OnClickListene
         button.setOnClickListener(this);
         createRoom = view.findViewById(R.id.createRoom);
         createRoom.setOnClickListener(this);
-
+        textView = view.findViewById(R.id.playerName);
+        String displayName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        textView.setText(displayName);
 
     }
 
@@ -97,7 +90,7 @@ public class CreateRoomFragments extends Fragment implements View.OnClickListene
             case R.id.createRoom:
                 RoomList roomList = new RoomList();
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, roomList, "findThisFragment")
+                        .replace(R.id.fragmentContainerView, roomList, "findThisFragment")
                         .addToBackStack(null)
                         .commit();
                 break;

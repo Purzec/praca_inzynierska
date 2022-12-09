@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pracainzynierska.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -104,7 +105,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.register:
-               // startActivity(new Intent(this, RegistryUser.class));
                 RegisterFragment registerFragment = new RegisterFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainerView, registerFragment, "menuFragment")
@@ -113,7 +113,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.singin:
                 //zabezpieczenie czy pola są wypełnione dodac
-                userLogin();
+                if (editTextEmail.length() != 0 && editTextEmail.length() != 0) {
+                    userLogin();
+                }
                 break;
         }
     }
@@ -129,17 +131,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 if (task.isSuccessful()) {
                     FirebaseUser userBeforeVerification = FirebaseAuth.getInstance().getCurrentUser();
                     if (userBeforeVerification.isEmailVerified()) {
-                   //     startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
                         CreateRoomFragments createRoomFragments = new CreateRoomFragments();
                         getActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragmentContainerView, createRoomFragments, "loginFragment")
                                 .addToBackStack(null)
                                 .commit();
                     } else {
-                       // Toast.makeText(LoginFragment.this, "Aktywuj swoje konto", Toast.LENGTH_SHORT).show();
+                         Toast.makeText(getContext(), "Aktywuj swoje konto", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                //    Toast.makeText(LoginActivity.this, "BAD CREDINTIAL", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "BAD CREDINTIAL", Toast.LENGTH_SHORT).show();
                 }
             }
         });

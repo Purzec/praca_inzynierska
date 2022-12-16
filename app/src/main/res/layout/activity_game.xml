@@ -8,25 +8,16 @@
     android:background="@drawable/background_main_menu">
 
     <ImageButton
-        android:id="@+id/nextButton"
-        android:layout_width="94dp"
-        android:layout_height="87dp"
-        android:background="@null"
-        android:scaleType="centerInside"
-        app:srcCompat="@drawable/next"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/infoButton"
-        />
-
-    <ImageButton
-        android:id="@+id/infoButton"
+        android:id="@+id/finishRound"
         android:layout_width="94dp"
         android:layout_height="87dp"
         android:background="@null"
         android:scaleType="centerInside"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/info" />
+        app:srcCompat="@drawable/ok" />
+
+
 
     <com.example.pracainzynierska.model.view.HexBoard
         android:layout_width="match_parent"
@@ -45,24 +36,15 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/choose_army"
+        android:visibility="invisible"
         >
-        <ImageView
-            android:id="@+id/img"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="@drawable/background_main_menu"
-            android:layout_margin="20dp"
-            />
 
-        <Button
-            android:id="@+id/closeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:backgroundTint="#B0CD2D2D"
-            android:textColor="@color/black"
-            android:text="@string/close" />
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </ListView>
+
     </RelativeLayout>
     <RelativeLayout android:layout_width="500dp"
         android:layout_height="300dp"
@@ -83,6 +65,17 @@
             android:backgroundTint="#B0CD2D2D"
             android:textColor="@color/black"
             android:text="@string/accept" />
+    </RelativeLayout>
+    <RelativeLayout android:layout_width="500dp"
+        android:layout_height="300dp"
+        android:id="@+id/waiting"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/waiting"
+        android:visibility="visible"
+        >
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

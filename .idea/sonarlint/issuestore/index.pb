@@ -20,10 +20,6 @@ F
 app/proguard-rules.pro,9\e\9e08934d811afe28fbc77aaa3c0d747b94348db9
 X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
-z
-Japp/src/main/java/com/example/pracainzynierska/model/gameStatus/Board.java,b\1\b19e68b8f16f8d1f6769c9e366408c039d7c510a
-{
-Kapp/src/main/java/com/example/pracainzynierska/model/gameStatus/Player.java,1\0\104dd3d5853434d80ef0ac527611fbbe43f684f9
 w
 Gapp/src/main/java/com/example/pracainzynierska/model/DTO/AttackDto.java,7\3\733417a9d0b35d1191f6cdbcdf2001999bb72ff4
 H

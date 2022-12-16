@@ -9,6 +9,8 @@ public class Player {
 
     private int id;
 
+    private String nick;
+
     private List<ArmyToken> chosenArmy;
 
     private List<ArmyToken> lobby;
@@ -51,6 +53,18 @@ public class Player {
 
     public void setDiscardToken(List<ArmyToken> discardToken) {
         this.discardToken = discardToken;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
     }
 
     // mozemy dobrac do 3 tokenów chyba ze mamy w lobby juz jakies np. jak mamy jednego tokena to mozemy dobrac 2

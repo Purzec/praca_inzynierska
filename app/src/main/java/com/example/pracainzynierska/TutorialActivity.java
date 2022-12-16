@@ -154,14 +154,6 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                 getQuiz(etap);
 
                 break;
-            case R.id.infoButton:
-                imgWithButton.setVisibility(View.VISIBLE);
-                System.out.println(imgWithButton.getLayoutParams().width);
-                System.out.println(imgWithButton.getLayoutParams().height);
-                imgWithButton.setX((float) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.2));
-                imgWithButton.setY((float) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.10));
-                imgWithButton.bringToFront();
-                break;
             case R.id.nextButton:
                 if (playerBase.isOnBoard()) {
                     startActivity(new Intent(TutorialActivity.this, TutorialActivity2.class));
@@ -182,7 +174,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                     bylo++;
                     //dodac sprawdzenie czy juz było wywołane todo jp
                     //dodanie tokenu bazy gracza
-                    playerBase.setBackground(getDrawable(R.drawable.token_1));
+                    playerBase.setBackground(getDrawable(R.drawable.token3a));
                     //   playerBase.setContextClickable(getApplicationContext());
                     //  playerBase.getImageView().setImageDrawable(getDrawable(R.drawable.token_1));
                     ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
@@ -193,7 +185,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
 
                     ArmyToken enemyBase = new ArmyToken(getApplicationContext());
                     enemyBase.setImageView(new ImageView(getApplicationContext()));
-                    enemyBase.setBackground(getDrawable(R.drawable.lucznik));
+                    enemyBase.setBackground(getDrawable(R.drawable.token3b));
                     enemyBase.setLayoutParams(new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5));
                     HexUtils.setHexToBoard(listatest, enemyBase, 2);
                     viewGroup.addView(enemyBase);

@@ -20,6 +20,9 @@ import android.widget.Toast;
 import com.example.pracainzynierska.GameActivity;
 import com.example.pracainzynierska.MainActivity3;
 import com.example.pracainzynierska.R;
+import com.example.pracainzynierska.model.gameStatus.Board;
+import com.example.pracainzynierska.model.gameStatus.Player;
+import com.example.pracainzynierska.model.view.HexBoard;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,6 +49,7 @@ public class RoomList extends Fragment {
 
     FirebaseDatabase database;
     DatabaseReference roomRef;
+    DatabaseReference boardRef;
 
     public RoomList() {
         // Required empty public constructor
@@ -78,17 +82,16 @@ public class RoomList extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_room_list, container, false);
     }
-
+    Player player = new Player();
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         //pobierz gracza i przypisz pokoj do jego loginu
         database = FirebaseDatabase.getInstance();
-
         SharedPreferences preferences = this.getActivity().getSharedPreferences("PREFS", 0);
-        playerName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-        roomName = playerName;
+        player.setNick(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        roomName = player.getNick();
 
         listView = view.findViewById(R.id.ListView);
         button = view.findViewById(R.id.button2);
@@ -103,10 +106,12 @@ public class RoomList extends Fragment {
                 //create a room i dodanie siebei jako jednego z graczy w nim
                 button.setText("CREATING ROOM");
                 button.setEnabled(false);
-                roomName = playerName;
+                roomName = player.getNick();
                 roomRef = database.getReference("rooms/" + roomName + "/player1");
+                boardRef = database.getReference("rooms/" + roomName + "/board");
                 addRoomEventListener();
-                roomRef.setValue(playerName);
+                player.setId(1);
+                roomRef.setValue(player);
             }
         });
 
@@ -118,8 +123,8 @@ public class RoomList extends Fragment {
                 roomName = roomsList.get(i);
                 roomRef = database.getReference("rooms/" + roomName + "/player2");
                 addRoomEventListener();
-                roomRef.setValue(playerName);
-
+                player.setId(2);
+                roomRef.setValue(player);
             }
         });
 
@@ -135,10 +140,10 @@ public class RoomList extends Fragment {
                 button.setText("CREATE ROOM");
                 button.setEnabled(true);
                 // dołaczenie do pokoju
-                Toast.makeText(getContext(),"elooooo",Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getContext(), MainActivity3.class);
+                Toast.makeText(getContext(), "elooooo", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), GameActivity.class);
                 intent.putExtra("roomName", roomName);
-                intent.putExtra("player",playerName);
+                intent.putExtra("player",player.getNick());
                 startActivity(intent);
             }
 

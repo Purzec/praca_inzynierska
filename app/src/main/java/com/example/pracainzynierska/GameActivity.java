@@ -2,41 +2,54 @@ package com.example.pracainzynierska;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.pracainzynierska.R;
 import com.example.pracainzynierska.databinding.ActivityGameBinding;
+import com.example.pracainzynierska.model.gameStatus.Board;
+import com.example.pracainzynierska.model.gameStatus.Player;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+
 public class GameActivity extends AppCompatActivity {
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
-    private static final boolean AUTO_HIDE = true;
 
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+    ImageButton button;
+    String playerName = "";
+    String roomName = "";
+    String role = "";
+    String message = "";
+    FirebaseDatabase database;
+    DatabaseReference messageRef, room;
+    RelativeLayout relativeLayout;
+    Board board;
+    private DatabaseReference mDatabase;
 
-    /**
-     * Some older devices needs a small delay between UI widget updates
-     * and a change of the status and navigation bar.
-     */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler(Looper.myLooper());
     private View mContentView;
@@ -61,7 +74,6 @@ public class GameActivity extends AppCompatActivity {
             }
         }
     };
-    private View mControlsView;
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
@@ -70,52 +82,59 @@ public class GameActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.show();
             }
-            mControlsView.setVisibility(View.VISIBLE);
         }
     };
-    private boolean mVisible;
     private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
             hide();
         }
     };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    if (AUTO_HIDE) {
-                        delayedHide(AUTO_HIDE_DELAY_MILLIS);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    view.performClick();
-                    break;
-                default:
-                    break;
-            }
-            return false;
-        }
-    };
+
     private ActivityGameBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         binding = ActivityGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        mVisible = true;
-        mControlsView = binding.RelativeLayout1;
+
         mContentView = binding.RelativeLayout1;
 
+        button = findViewById(R.id.finishRound);
+        button.setEnabled(false);
+
+        database = FirebaseDatabase.getInstance();
+        Bundle extras = getIntent().getExtras();
+        SharedPreferences preferences = getSharedPreferences("PREFS", 0);
+        playerName = extras.getString("player");
+
+        relativeLayout = findViewById(R.id.waiting);
+        if (extras != null) {
+            roomName = extras.getString("roomName");
+            if (roomName.equals(playerName)) {
+                role = "host";
+            } else {
+                role = "quest";
+            }
+        }
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //send message
+                button.setEnabled(false);
+                message = role + ":POKED!";
+                messageRef.setValue(message);
+            }
+        });
+        //nasłuchiwanie porzed nadchodząca wiadomościa
+        room = database.getReference("rooms/" + roomName);
+        addRoomEventListener();
     }
 
     @Override
@@ -132,9 +151,6 @@ public class GameActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-        mControlsView.setVisibility(View.GONE);
-        mVisible = false;
-
         // Schedule a runnable to remove the status and navigation bar after a delay
         mHideHandler.removeCallbacks(mShowPart2Runnable);
         mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
@@ -147,5 +163,35 @@ public class GameActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    private void addRoomEventListener() {
+        room.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Player> players = new ArrayList();
+                //jak zmienią się jakies informacje to leci ta metoda
+                snapshot.getChildren().forEach(dataSnapshot -> {
+                    Player value = dataSnapshot.getValue(Player.class);
+                    players.add(value);
+                });
+                // Metoda zamieniająca mapę na object
+                game(players);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                //error - rettry
+            }
+        });
+    }
+
+
+    private void game(List<Player> players) {
+        if (players.size()==2){
+            relativeLayout.setVisibility(View.GONE);
+            //zrobic po kolei, czyli najpierw jeden gracz wybiera armie potem drugi
+
+        }
     }
 }

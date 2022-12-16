@@ -153,14 +153,14 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                 getQuiz(etap);
 
                 break;
-            case R.id.infoButton:
+            /*case R.id.infoButton:
                 imgWithButton.setVisibility(View.VISIBLE);
                 System.out.println(imgWithButton.getLayoutParams().width);
                 System.out.println(imgWithButton.getLayoutParams().height);
                 imgWithButton.setX((float) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.2));
                 imgWithButton.setY((float) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.10));
                 imgWithButton.bringToFront();
-                break;
+                break;*/
             case R.id.nextButton:
                           startActivity(new Intent(TutorialActivity2.this, MenuActivity.class));
                 break;

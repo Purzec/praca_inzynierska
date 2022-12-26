@@ -23,10 +23,12 @@ public class ArmyTokenUtils extends AppCompatActivity {
 
         Drawable drawable = context.getApplicationContext().getDrawable(R.drawable.zwiadowca);
         Drawable drawable1 = context.getApplicationContext().getDrawable(R.drawable.lucznik);
+        Drawable drawable2 = context.getApplicationContext().getDrawable(R.drawable.token3a);
 
         List<ArmyTokenDto> armyTokenDtoList = new ArrayList<>();
         Attack attack = new Attack(1, AttackType.SHORT, 1, Directions.FORWARD_LEFT);
         Attack attack1 = new Attack(2, AttackType.LONG, 1, Directions.FORWARD);
+
 
         ArmyTokenDto tokenDto = new ArmyTokenDto(1, "zwiadowca", 2, Collections.singletonList(attack), 1, drawable, 1);
         ArmyTokenDto tokenDto1 = new ArmyTokenDto(2, "zwiadowca", 2, Collections.singletonList(attack), 1, drawable, 1);
@@ -35,6 +37,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         ArmyTokenDto tokenDto4 = new ArmyTokenDto(5, "łucznik", 3, Collections.singletonList(attack1), 1, drawable1, 1);
         ArmyTokenDto tokenDto5 = new ArmyTokenDto(6, "łucznik", 3, Collections.singletonList(attack1), 1, drawable1, 1);
         ArmyTokenDto tokenDto6 = new ArmyTokenDto(7, "łucznik", 3, Collections.singletonList(attack1), 1, drawable1, 1);
+        ArmyTokenDto tokenDto7 = new ArmyTokenDto(8, "dowodca", 0, Collections.singletonList(attack1), 1, drawable2, 1);
 
         armyTokenDtoList.add(tokenDto);
         armyTokenDtoList.add(tokenDto1);
@@ -43,6 +46,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         armyTokenDtoList.add(tokenDto4);
         armyTokenDtoList.add(tokenDto5);
         armyTokenDtoList.add(tokenDto6);
+        armyTokenDtoList.add(tokenDto7);
 
         return armyTokenDtoList;
     }
@@ -56,6 +60,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         AttackDto attack4 = new AttackDto(5, 5,AttackType.LONG, 1, Directions.FORWARD);
         AttackDto attack5 = new AttackDto(6, 6,AttackType.LONG, 1, Directions.FORWARD);
         AttackDto attack6 = new AttackDto(7, 7,AttackType.LONG, 1, Directions.FORWARD);
+        AttackDto attack7 = new AttackDto(8, 8,AttackType.SHORT, 1, Directions.ALL_DIRECTION);
 
         List<AttackDto> attacks = new ArrayList<>();
         attacks.add(attack);
@@ -65,6 +70,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         attacks.add(attack4);
         attacks.add(attack5);
         attacks.add(attack6);
+        attacks.add(attack7);
 
 
 

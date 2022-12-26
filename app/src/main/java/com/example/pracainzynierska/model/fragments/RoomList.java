@@ -106,11 +106,15 @@ public class RoomList extends Fragment {
                 //create a room i dodanie siebei jako jednego z graczy w nim
                 button.setText("CREATING ROOM");
                 button.setEnabled(false);
+                boardRef = database.getReference("rooms/" + roomName +"/hexBoard");
+                HexBoard hexBoard = new HexBoard(getContext());
+                boardRef.setValue(hexBoard.pobierzKordy());
                 roomName = player.getNick();
                 roomRef = database.getReference("rooms/" + roomName + "/player1");
-                boardRef = database.getReference("rooms/" + roomName + "/board");
                 addRoomEventListener();
                 player.setId(1);
+                player.setEtap(1);
+                player.setRoleLobby("host");
                 roomRef.setValue(player);
             }
         });
@@ -124,6 +128,8 @@ public class RoomList extends Fragment {
                 roomRef = database.getReference("rooms/" + roomName + "/player2");
                 addRoomEventListener();
                 player.setId(2);
+                player.setEtap(1);
+                player.setRoleLobby("quest");
                 roomRef.setValue(player);
             }
         });
@@ -140,7 +146,6 @@ public class RoomList extends Fragment {
                 button.setText("CREATE ROOM");
                 button.setEnabled(true);
                 // dołaczenie do pokoju
-                Toast.makeText(getContext(), "elooooo", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getContext(), GameActivity.class);
                 intent.putExtra("roomName", roomName);
                 intent.putExtra("player",player.getNick());

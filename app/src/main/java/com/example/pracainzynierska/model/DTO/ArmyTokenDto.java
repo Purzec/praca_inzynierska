@@ -46,6 +46,29 @@ public class ArmyTokenDto {
 
     private String owner;
 
+
+    /**
+     * Czy wybralismy token na drafcie
+     */
+    private boolean draftDiscard = false;
+
+
+    /**
+     * Liczba obrotów tokenu
+     */
+    private int rotationQuantity = 0;
+
+
+    /**
+     * ikona obrazka X
+     */
+    private Drawable cancelDrawable;
+
+    /**
+     * Slot w lobby
+     */
+    private int lobbySlot;
+
     public String getOwner() {
         return owner;
     }

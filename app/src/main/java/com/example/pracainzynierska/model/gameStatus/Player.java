@@ -1,6 +1,7 @@
 package com.example.pracainzynierska.model.gameStatus;
 
 import com.example.pracainzynierska.model.ArmyToken;
+import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class Player {
 
     private String nick;
 
-    private List<ArmyToken> chosenArmy;
+    private List<ArmyTokenDto> chosenArmy;
 
     private List<ArmyToken> lobby;
 
@@ -19,11 +20,15 @@ public class Player {
 
     private List<ArmyToken> discardToken;
 
+    private String roleLobby;
+
+    private int etap;
+
     public int getId() {
         return id;
     }
 
-    public List<ArmyToken> getChosenArmy() {
+    public List<ArmyTokenDto> getChosenArmy() {
         return chosenArmy;
     }
 
@@ -39,7 +44,7 @@ public class Player {
         return discardToken;
     }
 
-    public void setChosenArmy(List<ArmyToken> chosenArmy) {
+    public void setChosenArmy(List<ArmyTokenDto> chosenArmy) {
         this.chosenArmy = chosenArmy;
     }
 
@@ -67,12 +72,30 @@ public class Player {
         this.nick = nick;
     }
 
-    // mozemy dobrac do 3 tokenów chyba ze mamy w lobby juz jakies np. jak mamy jednego tokena to mozemy dobrac 2
+   /* // mozemy dobrac do 3 tokenów chyba ze mamy w lobby juz jakies np. jak mamy jednego tokena to mozemy dobrac 2
     public int getLimitTokenToDraft(){
         return 3- lobby.size();
-    }
+    }*/
 
     public Player() {
         this.lobby = new ArrayList<>();
     }
+
+    public String getRoleLobby() {
+        return roleLobby;
+    }
+
+    public int getEtap() {
+        return etap;
+    }
+
+    public void setEtap(int etap) {
+        this.etap = etap;
+    }
+
+    public void setRoleLobby(String roleLobby) {
+        this.roleLobby = roleLobby;
+    }
+
+
 }

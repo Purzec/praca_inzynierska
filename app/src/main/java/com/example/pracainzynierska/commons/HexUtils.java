@@ -4,6 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +17,9 @@ import android.widget.RelativeLayout;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.example.pracainzynierska.R;
 import com.example.pracainzynierska.model.ArmyToken;
+import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
 import com.example.pracainzynierska.model.Hex;
 import com.example.pracainzynierska.model.gameStatus.Player;
 
@@ -35,7 +43,7 @@ public class HexUtils extends Application {
     }
 
     //3,
-    public static void setToLobby(List<ArmyToken> armyTokens, ViewGroup relativeLayout, List<Hex> listatest, Context context,Player player) {
+    public static void setToLobby(List<ArmyToken> armyTokens, ViewGroup relativeLayout, List<Hex> listatest, Context context, Player player) {
         int slot = 0;
 
         for (ArmyToken armyToken : armyTokens) {
@@ -60,7 +68,7 @@ public class HexUtils extends Application {
             slot++;
             relativeLayout.addView(armyToken);
             armyToken.setOnClickListener(null);
-            armyToken.setOnTouchListener(onTouchListener(armyToken,listatest,relativeLayout,context,player));
+            armyToken.setOnTouchListener(onTouchListener(armyToken, listatest, relativeLayout, context, player));
         }
     }
 
@@ -156,7 +164,7 @@ public class HexUtils extends Application {
     }
 
 
-    public static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context,Player player) {
+    public static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context, Player player) {
 
         return new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -173,14 +181,14 @@ public class HexUtils extends Application {
                     case MotionEvent.ACTION_UP:
                         System.out.println("ACTION_UP");
                         int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
-                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, listatest, idPola,player);
+                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, listatest, idPola, player);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         System.out.println("ACTION_MOVE");
                         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view
                                 .getLayoutParams();
                         layoutParams.startToEnd = x - x - lParams.leftMargin;
-                        layoutParams.topToBottom = y -  y - lParams.topMargin;
+                        layoutParams.topToBottom = y - y - lParams.topMargin;
                         layoutParams.rightMargin = 0;
                         layoutParams.bottomMargin = 0;
                         //pobrac srodek obrazka
@@ -199,16 +207,16 @@ public class HexUtils extends Application {
         float centerHeightImageView = armyToken.getLayoutParams().height / 2;
         float centerWidthImageView = armyToken.getLayoutParams().width / 2;
         armyToken.setX(systemWidth / 10 - centerWidthImageView);
-        switch (armyToken.getLobbySlot()){
-                case 0:
-                    armyToken.setY((float) (systemHeight * 0.80 - centerHeightImageView));
-                    break;
-                case 1:
-                    armyToken.setY((float) (systemHeight * 0.60 - centerHeightImageView));
-                    break;
-                case 2:
-                    armyToken.setY((float) (systemHeight * 0.40 - centerHeightImageView));
-                    break;
+        switch (armyToken.getLobbySlot()) {
+            case 0:
+                armyToken.setY((float) (systemHeight * 0.80 - centerHeightImageView));
+                break;
+            case 1:
+                armyToken.setY((float) (systemHeight * 0.60 - centerHeightImageView));
+                break;
+            case 2:
+                armyToken.setY((float) (systemHeight * 0.40 - centerHeightImageView));
+                break;
         }
 
     }

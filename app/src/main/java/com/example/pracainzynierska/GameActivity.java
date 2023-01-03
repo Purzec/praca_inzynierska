@@ -49,22 +49,24 @@ import java.util.stream.Collectors;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
     SQLiteDatabase db;
-    private ArrayList<Hex> listatest;
+
     ListView listView;
     ImageButton button;
     String playerName = "";
     String roomName = "";
     String role = "";
     FirebaseDatabase database;
-    DatabaseReference messageRef, room, test;
+    DatabaseReference messageRef, room;
     RelativeLayout waiting, listViewArmy;
     ConstraintLayout boardView;
     Board board = new Board();
     HexBoard hexBoard;
-    ValueEventListener test2;
+
     private DatabaseReference mDatabase;
     private static final String HOST = "host";
     private static final String QUEST = "quest";
+    Board board2 = new Board();
+    int i = 0;
 
 
     private static final int UI_ANIMATION_DELAY = 300;
@@ -136,16 +138,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
-
         binding = ActivityGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         mContentView = binding.constraintLayout;
-
         button = findViewById(R.id.finishRound);
         button.setEnabled(false);
         button.setVisibility(View.GONE);
@@ -164,6 +160,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         hexBoard = findViewById(R.id.hexBoard);
+        listViewArmy = findViewById(R.id.listViewArmy);
+        listView = findViewById(R.id.listArmy);
         if (savedInstanceState == null) {
             room = database.getReference("rooms/" + roomName);
             room.child("message").setValue(role);
@@ -178,20 +176,24 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 board = snapshot.getValue(Board.class);
+                board2.setHexBoard(board.getHexBoard());
+                board2.setMessage(board.getMessage());
+                board2.setRound(board.getRound());
+                board2.setPlayers(board.getPlayers());
+                board2.setPlayer1(board.getPlayer1());
+                board2.setPlayer2(board.getPlayer2());
+
                 if (role.equals("host")) {
                     if (board.getMessage().equals("quest")) {
-                        button.setEnabled(true);
-                        button.setVisibility(View.VISIBLE);
                         game(board);
                     }
                 } else {
                     if (board.getMessage().equals("host")) {
-                        button.setEnabled(true);
-                        button.setVisibility(View.VISIBLE);
                         game(board);
                     }
                 }
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -199,19 +201,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+
     private void game(Board board) {
         if (board.getPlayer1() != null && board.getPlayer2() != null) {
             System.out.println("Wywołano metodę game");
             waiting.setVisibility(View.GONE);
-            if (board.getMessage().equals("host")) {
+            if (board.getMessage().equals("quest")) {
+                button.setEnabled(true);
+                button.setVisibility(View.VISIBLE);
                 System.out.println("Ekran widzi gracz: " + board.getPlayer1().getNick());
-                board.setMessage(role);
-                gameTurn(board.getPlayer1());
+                gameTurn(board2.getPlayer1());
 
             } else {
+                button.setEnabled(true);
+                button.setVisibility(View.VISIBLE);
                 System.out.println("Ekran widzi gracz: " + board.getPlayer2().getNick());
-                board.setMessage(role);
-                gameTurn(board.getPlayer2());
+                gameTurn(board2.getPlayer2());
             }
         }
     }
@@ -219,10 +224,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void gameTurn(Player player/*, DataSnapshot snapshot*/) {
         switch (player.getEtap()) {
             case 1:
-                if (player.getChosenArmy()==null) {
+                if (player.getChosenArmy() == null) {
                     System.out.println("wybór armii");
-                    listViewArmy = findViewById(R.id.listViewArmy);
-                    listView = findViewById(R.id.listArmy);
                     List<String> armyList = Arrays.asList("Elf", "Human");
                     listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, armyList));
                     listViewArmy.setVisibility(View.VISIBLE);
@@ -232,7 +235,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             String chosenArmy = armyList.get(i);
                             System.out.println(chosenArmy);
                             player.setChosenArmy(armyTokenGet());
-                            //  player.setEtap(2);
+                            player.setEtap(2);
                             listViewArmy.setVisibility(View.GONE);
                             endTurn(view);
                         }
@@ -242,12 +245,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case 2:
                 System.out.println("postawienie dowódcy");
-                //pobierz gracza o nazwie dowódca
-             /*   ArmyTokenDto tokenDto = player.getChosenArmy().stream().filter(armyTokenDto -> armyTokenDto.getName().equals("dowodca")).collect(Collectors.toList()).get(0);
-                // przerób dto na obiekt taki ładny
-                ArmyToken armyToken = createArmyToken(tokenDto, getApplicationContext());
-                armyToken.setBackground(armyToken.getImgToDatabase());
-                HexUtils.setToLobby(Arrays.asList(armyToken), boardView, listatest, getApplicationContext(), player);*/
                 break;
             default:
                 System.out.println("tury normalne");
@@ -261,13 +258,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void endTurn(View view) {
-        button.setEnabled(false);
-        button.setVisibility(View.GONE);
-        board.setMessage(role);
+        if (board.getMessage().equals("host")) {
+            // jeśli tak, to ustaw ture gracza "quest" i wiadomość "quest"
+            button.setEnabled(false);
+            button.setVisibility(View.GONE);
+            board.setMessage("quest");
+        } else {
+            // w przeciwnym razie ustaw ture gracza "host" i wiadomość "host"
+            button.setEnabled(false);
+            button.setVisibility(View.GONE);
+            board.setMessage("host");
+        }
+        // aktualizuj stan gry w bazie danych
         room.setValue(board);
-        Thread.currentThread().interrupt();
-    }
 
+    }
 
     public List<ArmyTokenDto> armyTokenGet() {
         int ownerArmyId = 1;
@@ -318,5 +323,4 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         c.close();
         return armyTokens.get(0);
     }
-
 }

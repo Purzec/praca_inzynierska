@@ -19,8 +19,20 @@ public class Board {
 
     private String round;
 
+    private boolean updating;
+
+    public Board() {
+        updating = false;
+    }
 
 
+    public boolean isUpdating() {
+        return updating;
+    }
+
+    public void setUpdating(boolean updating) {
+        this.updating = updating;
+    }
 
     public List<Player> getPlayers() {
         return players;

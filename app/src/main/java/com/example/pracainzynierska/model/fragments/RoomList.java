@@ -50,6 +50,7 @@ public class RoomList extends Fragment {
     FirebaseDatabase database;
     DatabaseReference roomRef;
     DatabaseReference boardRef;
+    DatabaseReference messRef;
 
     public RoomList() {
         // Required empty public constructor
@@ -106,9 +107,11 @@ public class RoomList extends Fragment {
                 //create a room i dodanie siebei jako jednego z graczy w nim
                 button.setText("CREATING ROOM");
                 button.setEnabled(false);
-                boardRef = database.getReference("rooms/" + roomName +"/hexBoard");
+                messRef = database.getReference("rooms/" + roomName +"/message");
+                messRef.setValue("host");
+              /*  boardRef = database.getReference("rooms/" + roomName +"/hexBoard");
                 HexBoard hexBoard = new HexBoard(getContext());
-                boardRef.setValue(hexBoard.pobierzKordy());
+                boardRef.setValue(hexBoard.pobierzKordy());*/
                 roomName = player.getNick();
                 roomRef = database.getReference("rooms/" + roomName + "/player1");
                 addRoomEventListener();
@@ -125,12 +128,15 @@ public class RoomList extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //dolacz do istniejacego pokoju jako gracz 2
                 roomName = roomsList.get(i);
+                messRef = database.getReference("rooms/" + roomName +"/message");
+                messRef.setValue("host");
                 roomRef = database.getReference("rooms/" + roomName + "/player2");
                 addRoomEventListener();
                 player.setId(2);
                 player.setEtap(1);
                 player.setRoleLobby("quest");
                 roomRef.setValue(player);
+
             }
         });
 

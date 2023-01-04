@@ -1,5 +1,7 @@
 package com.example.pracainzynierska;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -35,6 +38,8 @@ import com.example.pracainzynierska.model.Hex;
 import com.example.pracainzynierska.model.gameStatus.Board;
 import com.example.pracainzynierska.model.gameStatus.Player;
 import com.example.pracainzynierska.model.view.HexBoard;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -49,14 +54,14 @@ import java.util.stream.Collectors;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
     SQLiteDatabase db;
-
+    List<ArmyTokenDto> tmpArmy;
     ListView listView;
     ImageButton button;
     String playerName = "";
     String roomName = "";
     String role = "";
     FirebaseDatabase database;
-    DatabaseReference messageRef, room;
+    DatabaseReference room, messageRef ;
     RelativeLayout waiting, listViewArmy;
     ConstraintLayout boardView;
     Board board = new Board();
@@ -163,20 +168,49 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         listViewArmy = findViewById(R.id.listViewArmy);
         listView = findViewById(R.id.listArmy);
         if (savedInstanceState == null) {
-            room = database.getReference("rooms/" + roomName);
-            room.child("message").setValue(role);
+
+            messageRef = FirebaseDatabase.getInstance().getReference("rooms/"+roomName);
+
+            messageRef.addValueEventListener(new ValueEventListener() {
+                                                 @Override
+                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                     // pobierz wartości wszystkich pól z bazy danych i ustaw je w obiekcie klasy Board
+                                                     board.setMessage(dataSnapshot.child("message").getValue(String.class));
+                                                     board.setRound(dataSnapshot.child("round").getValue(String.class));
+                                                     board.setPlayer1(dataSnapshot.child("player1").getValue(Player.class));
+                                                     board.setPlayer2(dataSnapshot.child("player2").getValue(Player.class));
+                                                    // board.setHexBoard(dataSnapshot.child("hexBoard").getValue(List.class));
+
+                                                     if (role.equals("host")) {
+                                                         if (board.getMessage().equals("quest")) {
+                                                             game(board);
+                                                         }
+                                                     } else {
+                                                         if (board.getMessage().equals("host")) {
+                                                             game(board);
+                                                         }
+                                                     }
+                                                 }
+
+                                                 @Override
+                                                 public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                     System.out.println("bład");
+                                                 }
+                                             });
+        }
+
             // everything else that doesn't update UI
             System.out.println("dodano listenera");
-            addRoomEventListener();
+          //  addRoomEventListener();
         }
-    }
+
 
     private void addRoomEventListener() {
         room.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 board = snapshot.getValue(Board.class);
-                board2.setHexBoard(board.getHexBoard());
+              //  board2.setHexBoard(board.getHexBoard());
                 board2.setMessage(board.getMessage());
                 board2.setRound(board.getRound());
                 board2.setPlayers(board.getPlayers());
@@ -197,6 +231,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("BLADDDDDDDDDDDDDDDDDDD");
+                // wyświetl komunikat błędu, jeśli operacja nie powiedzie się
+                Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
     }
@@ -210,13 +247,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 button.setEnabled(true);
                 button.setVisibility(View.VISIBLE);
                 System.out.println("Ekran widzi gracz: " + board.getPlayer1().getNick());
-                gameTurn(board2.getPlayer1());
+                gameTurn(board.getPlayer1());
 
             } else {
                 button.setEnabled(true);
                 button.setVisibility(View.VISIBLE);
                 System.out.println("Ekran widzi gracz: " + board.getPlayer2().getNick());
-                gameTurn(board2.getPlayer2());
+                gameTurn(board.getPlayer2());
             }
         }
     }
@@ -234,10 +271,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                             String chosenArmy = armyList.get(i);
                             System.out.println(chosenArmy);
-                            player.setChosenArmy(armyTokenGet());
-                            player.setEtap(2);
                             listViewArmy.setVisibility(View.GONE);
-                            endTurn(view);
+                            tmpArmy = armyTokenGet();
                         }
                     });
                 }
@@ -263,14 +298,34 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             button.setEnabled(false);
             button.setVisibility(View.GONE);
             board.setMessage("quest");
+            board.getPlayer1().setEtap(2);
+            board.getPlayer1().setChosenArmy(armyTokenGet());
         } else {
             // w przeciwnym razie ustaw ture gracza "host" i wiadomość "host"
             button.setEnabled(false);
             button.setVisibility(View.GONE);
+            board.getPlayer2().setEtap(2);
+            board.getPlayer2().setChosenArmy(armyTokenGet());;
             board.setMessage("host");
         }
         // aktualizuj stan gry w bazie danych
-        room.setValue(board);
+      //  room.updateChildren(board.toMap());
+        // aktualizuj wszystkie pola jednocześnie
+        messageRef.updateChildren(board.toMap())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // operacja zakończyła się powodzeniem
+                        System.out.println("sukces");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // operacja nie powiodła się
+                        System.out.println("bład2");
+                    }
+                });
 
     }
 

@@ -3,13 +3,15 @@ package com.example.pracainzynierska.model.gameStatus;
 import com.example.pracainzynierska.model.Hex;
 import com.example.pracainzynierska.model.view.HexBoard;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Board {
 
     private List<Player> players;
 
-    private List<Hex> hexBoard;
+   // private List<Hex> hexBoard;
 
     private Player player1;
 
@@ -74,11 +76,23 @@ public class Board {
         this.message = message;
     }
 
-    public List<Hex> getHexBoard() {
+ /*   public List<Hex> getHexBoard() {
         return hexBoard;
     }
 
     public void setHexBoard(List<Hex> hexBoard) {
         this.hexBoard = hexBoard;
+    }*/
+
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("players", players);
+    //    result.put("hexBoard", hexBoard);
+        result.put("player1", player1);
+        result.put("message", message);
+        result.put("player2", player2);
+        result.put("round", round);
+        result.put("updating", updating);
+        return result;
     }
 }

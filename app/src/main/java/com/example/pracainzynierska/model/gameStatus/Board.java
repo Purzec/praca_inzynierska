@@ -9,15 +9,17 @@ import java.util.Map;
 
 public class Board {
 
-    private List<Player> players;
+    private Player players = new Player();
 
-   // private List<Hex> hexBoard;
+    private Player players2 = new Player();
 
-    private Player player1;
+    private List<Hex> hexBoard;
+
+    private Player player1 = new Player();
 
     private String message;
 
-    private Player player2;
+    private Player player2 = new Player();
 
     private String round;
 
@@ -36,12 +38,20 @@ public class Board {
         this.updating = updating;
     }
 
-    public List<Player> getPlayers() {
+    public Player getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<Player> players) {
+    public void setPlayers(Player players) {
         this.players = players;
+    }
+
+    public Player getPlayers2() {
+        return players2;
+    }
+
+    public void setPlayers2(Player players2) {
+        this.players2 = players2;
     }
 
     public String getRound() {
@@ -76,18 +86,19 @@ public class Board {
         this.message = message;
     }
 
- /*   public List<Hex> getHexBoard() {
+   public List<Hex> getHexBoard() {
         return hexBoard;
     }
 
     public void setHexBoard(List<Hex> hexBoard) {
         this.hexBoard = hexBoard;
-    }*/
+    }
 
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("players", players);
-    //    result.put("hexBoard", hexBoard);
+        result.put("players2", players2);
+        result.put("hexBoard", hexBoard);
         result.put("player1", player1);
         result.put("message", message);
         result.put("player2", player2);

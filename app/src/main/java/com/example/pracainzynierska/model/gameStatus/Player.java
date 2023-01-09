@@ -98,4 +98,17 @@ public class Player {
     }
 
 
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", nick='" + nick + '\'' +
+                ", chosenArmy=" + chosenArmy +
+                ", lobby=" + lobby +
+                ", draft=" + draft +
+                ", discardToken=" + discardToken +
+                ", roleLobby='" + roleLobby + '\'' +
+                ", etap=" + etap +
+                '}';
+    }
 }

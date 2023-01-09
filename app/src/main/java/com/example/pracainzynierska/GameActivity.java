@@ -44,6 +44,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -167,6 +168,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         hexBoard = findViewById(R.id.hexBoard);
         listViewArmy = findViewById(R.id.listViewArmy);
         listView = findViewById(R.id.listArmy);
+
         if (savedInstanceState == null) {
 
             messageRef = FirebaseDatabase.getInstance().getReference("rooms/"+roomName);
@@ -179,81 +181,46 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                                      board.setRound(dataSnapshot.child("round").getValue(String.class));
                                                      board.setPlayer1(dataSnapshot.child("player1").getValue(Player.class));
                                                      board.setPlayer2(dataSnapshot.child("player2").getValue(Player.class));
-                                                    // board.setHexBoard(dataSnapshot.child("hexBoard").getValue(List.class));
-
-                                                     if (role.equals("host")) {
-                                                         if (board.getMessage().equals("quest")) {
-                                                             game(board);
-                                                         }
-                                                     } else {
-                                                         if (board.getMessage().equals("host")) {
-                                                             game(board);
-                                                         }
+                                                     if (dataSnapshot.child("players").getValue(Player.class)==null)
+                                                     {
+                                                         board.setPlayers(dataSnapshot.child("player1").getValue(Player.class));
+                                                     }else {
+                                                         board.setPlayers(dataSnapshot.child("players").getValue(Player.class));
                                                      }
+                                                     if (dataSnapshot.child("players2").getValue(Player.class)==null)
+                                                     {
+                                                         board.setPlayers2(dataSnapshot.child("player2").getValue(Player.class));
+                                                     }else {
+                                                         board.setPlayers2(dataSnapshot.child("players2").getValue(Player.class));
+                                                     }
+                                                     board.setHexBoard(dataSnapshot.child("hexBoard").getValue(new GenericTypeIndicator<List<Hex>>(){}));
+                                                     game(board);
                                                  }
-
                                                  @Override
                                                  public void onCancelled(@NonNull DatabaseError databaseError) {
                                                      System.out.println("bład");
                                                  }
                                              });
         }
-
-            // everything else that doesn't update UI
-            System.out.println("dodano listenera");
-          //  addRoomEventListener();
         }
-
-
-    private void addRoomEventListener() {
-        room.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                board = snapshot.getValue(Board.class);
-              //  board2.setHexBoard(board.getHexBoard());
-                board2.setMessage(board.getMessage());
-                board2.setRound(board.getRound());
-                board2.setPlayers(board.getPlayers());
-                board2.setPlayer1(board.getPlayer1());
-                board2.setPlayer2(board.getPlayer2());
-
-                if (role.equals("host")) {
-                    if (board.getMessage().equals("quest")) {
-                        game(board);
-                    }
-                } else {
-                    if (board.getMessage().equals("host")) {
-                        game(board);
-                    }
-                }
-            }
-
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                System.out.println("BLADDDDDDDDDDDDDDDDDDD");
-                // wyświetl komunikat błędu, jeśli operacja nie powiedzie się
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
-
-
     private void game(Board board) {
-        if (board.getPlayer1() != null && board.getPlayer2() != null) {
+        if (board.getPlayer1() != null && board.getPlayers2() != null) {
             System.out.println("Wywołano metodę game");
             waiting.setVisibility(View.GONE);
-            if (board.getMessage().equals("quest")) {
-                button.setEnabled(true);
-                button.setVisibility(View.VISIBLE);
-                System.out.println("Ekran widzi gracz: " + board.getPlayer1().getNick());
-                gameTurn(board.getPlayer1());
-
+            if (role.equals("host")) {
+                if (board.getMessage().equals("host")) {
+                    button.setEnabled(true);
+                    button.setVisibility(View.VISIBLE);
+                    System.out.println("Ekran widzi gracz: " + board.getPlayers2().getNick());
+                    gameTurn(board.getPlayers2());
+                }
             } else {
-                button.setEnabled(true);
-                button.setVisibility(View.VISIBLE);
-                System.out.println("Ekran widzi gracz: " + board.getPlayer2().getNick());
-                gameTurn(board.getPlayer2());
+                if (board.getMessage().equals("quest")) {
+                    button.setEnabled(true);
+                    button.setVisibility(View.VISIBLE);
+                    System.out.println("Ekran widzi gracz: " + board.getPlayers().getNick());
+                    gameTurn(board.getPlayers());
+                }
             }
         }
     }
@@ -276,7 +243,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     });
                 }
-
                 break;
             case 2:
                 System.out.println("postawienie dowódcy");
@@ -286,31 +252,30 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-
     @Override
     public void onClick(View view) {
         endTurn(view);
     }
-
     public void endTurn(View view) {
-        if (board.getMessage().equals("host")) {
+
+        if (board.getMessage().equals("quest")) {
             // jeśli tak, to ustaw ture gracza "quest" i wiadomość "quest"
             button.setEnabled(false);
             button.setVisibility(View.GONE);
-            board.setMessage("quest");
-            board.getPlayer1().setEtap(2);
-            board.getPlayer1().setChosenArmy(armyTokenGet());
+            board.setMessage("host");
+            board.getPlayers().setEtap(2);
+            board.getPlayers().setChosenArmy(armyTokenGet());
+
         } else {
             // w przeciwnym razie ustaw ture gracza "host" i wiadomość "host"
             button.setEnabled(false);
             button.setVisibility(View.GONE);
-            board.getPlayer2().setEtap(2);
-            board.getPlayer2().setChosenArmy(armyTokenGet());;
-            board.setMessage("host");
+            board.setMessage("quest");
+            board.getPlayers2().setEtap(2);
+            board.getPlayers2().setChosenArmy(armyTokenGet());
         }
-        // aktualizuj stan gry w bazie danych
-      //  room.updateChildren(board.toMap());
-        // aktualizuj wszystkie pola jednocześnie
+
+
         messageRef.updateChildren(board.toMap())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -349,9 +314,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         c.close();
         return tokensPlayer;
     }
-
-    //todo jp pobierz z bazy i dodaj do niego listę armii
-
 
     public ArmyToken createArmyToken(ArmyTokenDto tokenDto, Context context) {
         db = openOrCreateDatabase("PracaInzynierskaTest", MODE_PRIVATE, null);

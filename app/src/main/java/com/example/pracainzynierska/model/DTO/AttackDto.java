@@ -30,6 +30,16 @@ public class AttackDto {
      */
     private Directions directions;
 
+    private int initiative;
+
+    public int getInitiative() {
+        return initiative;
+    }
+
+    public void setInitiative(int initiative) {
+        this.initiative = initiative;
+    }
+
     public int getId() {
         return id;
     }
@@ -70,11 +80,12 @@ public class AttackDto {
         this.directions = directions;
     }
 
-    public AttackDto(int id, int tokenID, AttackType attackType, int strenght, Directions directions) {
+    public AttackDto(int id, int tokenID, AttackType attackType, int strenght, Directions directions, int initiative) {
         this.id = id;
         this.tokenID = tokenID;
         this.attackType = attackType;
         this.strenght = strenght;
         this.directions = directions;
+        this.initiative = initiative;
     }
 }

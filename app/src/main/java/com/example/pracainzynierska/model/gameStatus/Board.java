@@ -9,17 +9,17 @@ import java.util.Map;
 
 public class Board {
 
-    private Player players = new Player();
+    private Player p1info;
 
-    private Player players2 = new Player();
+    private Player p2info;
 
     private List<Hex> hexBoard;
 
-    private Player player1 = new Player();
+    private Player player1;
 
     private String message;
 
-    private Player player2 = new Player();
+    private Player player2;
 
     private String round;
 
@@ -29,6 +29,21 @@ public class Board {
         updating = false;
     }
 
+    public Player getP1info() {
+        return p1info;
+    }
+
+    public void setP1info(Player p1info) {
+        this.p1info = p1info;
+    }
+
+    public Player getP2info() {
+        return p2info;
+    }
+
+    public void setP2info(Player p2info) {
+        this.p2info = p2info;
+    }
 
     public boolean isUpdating() {
         return updating;
@@ -36,22 +51,6 @@ public class Board {
 
     public void setUpdating(boolean updating) {
         this.updating = updating;
-    }
-
-    public Player getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(Player players) {
-        this.players = players;
-    }
-
-    public Player getPlayers2() {
-        return players2;
-    }
-
-    public void setPlayers2(Player players2) {
-        this.players2 = players2;
     }
 
     public String getRound() {
@@ -96,8 +95,8 @@ public class Board {
 
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("players", players);
-        result.put("players2", players2);
+        result.put("p1info", p1info);
+        result.put("p2info", p2info);
         result.put("hexBoard", hexBoard);
         result.put("player1", player1);
         result.put("message", message);

@@ -124,36 +124,50 @@ public class MenuActivity extends AppCompatActivity{
 
     //todo jp zmienic baze danych i tabele gdzy nie bedize juz testu
     private void initDatabase() {
-        db = openOrCreateDatabase("PracaInzynierskaTest", MODE_PRIVATE, null);
+        db = openOrCreateDatabase("PracaInzynierskaTest2", MODE_PRIVATE, null);
         String sqlDB = "CREATE TABLE IF NOT EXISTS" +
                 " ARMY_TOKENS_TEST (Id INTEGER, name VARCHAR, " +
-                "initiative INTEGER,life INTEGER,image BLOB,ARMY_OWNER_ID INTEGER)";
+                "life INTEGER,image BLOB,ARMY_OWNER_ID INTEGER)";
         db.execSQL(sqlDB);
-        String sqlCount = "SELECT count(*) FROM ARMY_TOKENS_TEST";
+        String sqlCount = "SELECT count(*) FROM ARMY_TOKENS_TEST WHERE ARMY_OWNER_ID = 1";
         Cursor cursor = db.rawQuery(sqlCount, null);
         cursor.moveToFirst();
         int ilosc = cursor.getInt(0);
         cursor.close();
+        System.out.println("ilosc:" +ilosc);
         if (ilosc == 0) {
-            String sqlArmyToken = "INSERT INTO ARMY_TOKENS_TEST VALUES (?,?,?,?,?,?)";
+            String sqlArmyToken = "INSERT INTO ARMY_TOKENS_TEST VALUES (?,?,?,?,?)";
             SQLiteStatement statement = db.compileStatement(sqlArmyToken);
-            List<ArmyTokenDto> armyHumanTokens = armyTokenUtils.initElfArmy(getApplicationContext());
-            addToDAtabaseArmyToken(armyHumanTokens, statement);
+            List<ArmyTokenDto> armyElfTokensA = armyTokenUtils.initElfArmyA(getApplicationContext());
+            addToDAtabaseArmyToken(armyElfTokensA, statement);
+            List<ArmyTokenDto> armyElfTokensB = armyTokenUtils.initElfArmyB(getApplicationContext());
+            addToDAtabaseArmyToken(armyElfTokensB, statement);
+            List<ArmyTokenDto> armyHumanTokensC = armyTokenUtils.initHumanArmyC(getApplicationContext());
+            addToDAtabaseArmyToken(armyHumanTokensC, statement);
+            List<ArmyTokenDto> armyHumanTokensD = armyTokenUtils.initHumanArmyD(getApplicationContext());
+            addToDAtabaseArmyToken(armyHumanTokensD, statement);
         }
 
         String sqlAttackList = "CREATE TABLE IF NOT EXISTS ARMY_ATTACK_TEST" +
-                " (ID Integer, TOKEN_ID INTEGER, ATTACK_TYPE VARCHAR, STRENGHT INTEGER, DIRECTIONS VARCHAR)";
+                " (ID Integer, TOKEN_ID INTEGER, ATTACK_TYPE VARCHAR, STRENGHT INTEGER, DIRECTIONS VARCHAR, INITIATIVE Integer)";
         db.execSQL(sqlAttackList);
         String sqlCountArmyAttack = "SELECT count(*) FROM ARMY_ATTACK_TEST";
         Cursor cursorArmyAttack = db.rawQuery(sqlCountArmyAttack, null);
         cursorArmyAttack.moveToFirst();
         int countArmyAttack = cursorArmyAttack.getInt(0);
         cursorArmyAttack.close();
+        System.out.println("countArmyAttack:" +countArmyAttack);
         if (countArmyAttack == 0) {
-            String sqlArmyAttacks = "INSERT INTO ARMY_ATTACK_TEST VALUES(?,?,?,?,?)";
+            String sqlArmyAttacks = "INSERT INTO ARMY_ATTACK_TEST VALUES(?,?,?,?,?,?)";
             SQLiteStatement statementArmyAttacks = db.compileStatement(sqlArmyAttacks);
-            List<AttackDto> elfArmyAttack = armyTokenUtils.initElfArmyAttack();
-            addToDatabaseAttackToken(elfArmyAttack, statementArmyAttacks);
+            List<AttackDto> elfArmyAttackA = armyTokenUtils.initElfArmyAttackA();
+            addToDatabaseAttackToken(elfArmyAttackA, statementArmyAttacks);
+            List<AttackDto> elfArmyAttackB = armyTokenUtils.initElfArmyAttackB();
+            addToDatabaseAttackToken(elfArmyAttackB, statementArmyAttacks);
+            List<AttackDto> humanArmyAttackC = armyTokenUtils.initHumanArmyAttackC();
+            addToDatabaseAttackToken(humanArmyAttackC, statementArmyAttacks);
+            List<AttackDto> humanArmyAttackD = armyTokenUtils.initHumanArmyAttackD();
+            addToDatabaseAttackToken(humanArmyAttackD, statementArmyAttacks);
         }
     }
 
@@ -164,6 +178,7 @@ public class MenuActivity extends AppCompatActivity{
             statement.bindString(3, attackDto.getAttackType().name());
             statement.bindLong(4, attackDto.getStrenght());
             statement.bindString(5,attackDto.getDirections().name());
+            statement.bindLong(6,attackDto.getInitiative());
             statement.executeInsert();
         }
     }
@@ -172,14 +187,13 @@ public class MenuActivity extends AppCompatActivity{
         for (ArmyTokenDto tokenDto : armyTokenDtoList) {
             statement.bindLong(1, tokenDto.getId());
             statement.bindString(2, tokenDto.getName());
-            statement.bindLong(3, tokenDto.getInitiative());
-            statement.bindLong(4, tokenDto.getLife());
+            statement.bindLong(3, tokenDto.getLife());
             Bitmap bitmap = ((BitmapDrawable) tokenDto.getImgToDatabase()).getBitmap();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] bitmapdata = stream.toByteArray();
-            statement.bindBlob(5, bitmapdata);
-            statement.bindLong(6, tokenDto.getArmyOwnerId());
+            statement.bindBlob(4, bitmapdata);
+            statement.bindLong(5, tokenDto.getArmyOwnerId());
             statement.executeInsert();
         }
     }

@@ -109,15 +109,11 @@ public class RoomList extends Fragment {
                 button.setEnabled(false);
                 messRef = database.getReference("rooms/" + roomName +"/message");
                 messRef.setValue("host");
-              /*  boardRef = database.getReference("rooms/" + roomName +"/hexBoard");
-                HexBoard hexBoard = new HexBoard(getContext());
-                boardRef.setValue(hexBoard.pobierzKordy());*/
                 roomName = player.getNick();
-                roomRef = database.getReference("rooms/" + roomName + "/player1");
+                roomRef = database.getReference("rooms/" + roomName + "/p1info");
                 addRoomEventListener();
                 player.setId(1);
                 player.setEtap(1);
-                player.setRoleLobby("host");
                 roomRef.setValue(player);
             }
         });
@@ -129,14 +125,12 @@ public class RoomList extends Fragment {
                 //dolacz do istniejacego pokoju jako gracz 2
                 roomName = roomsList.get(i);
                 messRef = database.getReference("rooms/" + roomName +"/message");
-                messRef.setValue("host");
-                roomRef = database.getReference("rooms/" + roomName + "/player2");
+                messRef.setValue("quest");
+                roomRef = database.getReference("rooms/" + roomName + "/p2info");
                 addRoomEventListener();
                 player.setId(2);
                 player.setEtap(1);
-                player.setRoleLobby("quest");
                 roomRef.setValue(player);
-
             }
         });
 

@@ -30,9 +30,11 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.example.pracainzynierska.commons.ArmyTokenUtils;
 import com.example.pracainzynierska.commons.HexUtils;
 import com.example.pracainzynierska.databinding.ActivityGameBinding;
 import com.example.pracainzynierska.model.ArmyToken;
+import com.example.pracainzynierska.model.Attack;
 import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
 import com.example.pracainzynierska.model.Hex;
 import com.example.pracainzynierska.model.gameStatus.Board;
@@ -62,17 +64,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     String roomName = "";
     String role = "";
     FirebaseDatabase database;
-    DatabaseReference room, messageRef ;
+    DatabaseReference room, messageRef;
     RelativeLayout waiting, listViewArmy;
     ConstraintLayout boardView;
     Board board = new Board();
     HexBoard hexBoard;
+    ArmyTokenUtils armyTokenUtils = new ArmyTokenUtils();
 
-    private DatabaseReference mDatabase;
+
     private static final String HOST = "host";
     private static final String QUEST = "quest";
-    Board board2 = new Board();
-    int i = 0;
 
 
     private static final int UI_ANIMATION_DELAY = 300;
@@ -144,7 +145,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         binding = ActivityGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         mContentView = binding.constraintLayout;
@@ -161,6 +161,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             roomName = extras.getString("roomName");
             if (roomName.equals(playerName)) {
                 role = "host";
+                //dodac tutaj inicjalizacje pola hexów u ktoregoś z graczy
             } else {
                 role = "quest";
             }
@@ -171,61 +172,58 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         if (savedInstanceState == null) {
 
-            messageRef = FirebaseDatabase.getInstance().getReference("rooms/"+roomName);
+            messageRef = FirebaseDatabase.getInstance().getReference("rooms/" + roomName);
 
             messageRef.addValueEventListener(new ValueEventListener() {
-                                                 @Override
-                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                     // pobierz wartości wszystkich pól z bazy danych i ustaw je w obiekcie klasy Board
-                                                     board.setMessage(dataSnapshot.child("message").getValue(String.class));
-                                                     board.setRound(dataSnapshot.child("round").getValue(String.class));
-                                                     board.setPlayer1(dataSnapshot.child("player1").getValue(Player.class));
-                                                     board.setPlayer2(dataSnapshot.child("player2").getValue(Player.class));
-                                                     if (dataSnapshot.child("players").getValue(Player.class)==null)
-                                                     {
-                                                         board.setPlayers(dataSnapshot.child("player1").getValue(Player.class));
-                                                     }else {
-                                                         board.setPlayers(dataSnapshot.child("players").getValue(Player.class));
-                                                     }
-                                                     if (dataSnapshot.child("players2").getValue(Player.class)==null)
-                                                     {
-                                                         board.setPlayers2(dataSnapshot.child("player2").getValue(Player.class));
-                                                     }else {
-                                                         board.setPlayers2(dataSnapshot.child("players2").getValue(Player.class));
-                                                     }
-                                                     board.setHexBoard(dataSnapshot.child("hexBoard").getValue(new GenericTypeIndicator<List<Hex>>(){}));
-                                                     game(board);
-                                                 }
-                                                 @Override
-                                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                     System.out.println("bład");
-                                                 }
-                                             });
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    // pobierz wartości wszystkich pól z bazy danych i ustaw je w obiekcie klasy Board
+                    board.setMessage(dataSnapshot.child("message").getValue(String.class));
+                    board.setRound(dataSnapshot.child("round").getValue(String.class));
+                    board.setP1info(dataSnapshot.child("p1info").getValue(Player.class));
+                    board.setP2info(dataSnapshot.child("p2info").getValue(Player.class));
+                    if (dataSnapshot.child("player1").getValue(Player.class) == null) {
+                        board.setPlayer1(dataSnapshot.child("p1info").getValue(Player.class));
+                    } else {
+                        board.setPlayer1(dataSnapshot.child("player1").getValue(Player.class));
+                    }
+                    if (dataSnapshot.child("player2").getValue(Player.class) == null) {
+                        board.setPlayer2(dataSnapshot.child("p2info").getValue(Player.class));
+                    } else {
+                        board.setPlayer2(dataSnapshot.child("player2").getValue(Player.class));
+                    }
+                    board.setHexBoard(dataSnapshot.child("hexBoard").getValue(new GenericTypeIndicator<List<Hex>>() {
+                    }));
+                    game(board);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    System.out.println("bład");
+                }
+            });
         }
-        }
+    }
+
     private void game(Board board) {
-        if (board.getPlayer1() != null && board.getPlayers2() != null) {
+        if (board.getPlayer1() != null && board.getPlayer2() != null) {
             System.out.println("Wywołano metodę game");
             waiting.setVisibility(View.GONE);
             if (role.equals("host")) {
                 if (board.getMessage().equals("host")) {
-                    button.setEnabled(true);
-                    button.setVisibility(View.VISIBLE);
-                    System.out.println("Ekran widzi gracz: " + board.getPlayers2().getNick());
-                    gameTurn(board.getPlayers2());
+                    System.out.println("Ekran widzi gracz: " + board.getPlayer1().getNick());
+                    gameTurn(board.getPlayer1());
                 }
             } else {
                 if (board.getMessage().equals("quest")) {
-                    button.setEnabled(true);
-                    button.setVisibility(View.VISIBLE);
-                    System.out.println("Ekran widzi gracz: " + board.getPlayers().getNick());
-                    gameTurn(board.getPlayers());
+                    System.out.println("Ekran widzi gracz: " + board.getPlayer2().getNick());
+                    gameTurn(board.getPlayer2());
                 }
             }
         }
     }
 
-    private void gameTurn(Player player/*, DataSnapshot snapshot*/) {
+    private void gameTurn(Player player) {
         switch (player.getEtap()) {
             case 1:
                 if (player.getChosenArmy() == null) {
@@ -236,43 +234,42 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            String chosenArmy = armyList.get(i);
-                            System.out.println(chosenArmy);
                             listViewArmy.setVisibility(View.GONE);
-                            tmpArmy = armyTokenGet();
+                            player.setEtap(2);
+                            String chosenArmy = armyList.get(i);
+                            player.setChosenArmy(armyTokenGet(getPlayerNumber(chosenArmy,board.getMessage())));
+                            isClickable();
+                            makeButtonGreen();
                         }
                     });
                 }
                 break;
             case 2:
+                isClickable();
                 System.out.println("postawienie dowódcy");
                 break;
             default:
+                isClickable();
                 System.out.println("tury normalne");
                 break;
         }
     }
+
     @Override
     public void onClick(View view) {
         endTurn(view);
     }
+
     public void endTurn(View view) {
 
         if (board.getMessage().equals("quest")) {
             // jeśli tak, to ustaw ture gracza "quest" i wiadomość "quest"
-            button.setEnabled(false);
-            button.setVisibility(View.GONE);
+            noClickable();
             board.setMessage("host");
-            board.getPlayers().setEtap(2);
-            board.getPlayers().setChosenArmy(armyTokenGet());
-
         } else {
             // w przeciwnym razie ustaw ture gracza "host" i wiadomość "host"
-            button.setEnabled(false);
-            button.setVisibility(View.GONE);
+            noClickable();
             board.setMessage("quest");
-            board.getPlayers2().setEtap(2);
-            board.getPlayers2().setChosenArmy(armyTokenGet());
         }
 
 
@@ -288,25 +285,26 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // operacja nie powiodła się
-                        System.out.println("bład2");
+                        System.out.println("bład");
                     }
                 });
 
     }
 
-    public List<ArmyTokenDto> armyTokenGet() {
-        int ownerArmyId = 1;
+    public List<ArmyTokenDto> armyTokenGet(int ownerArmyId) {
+
+        System.out.println(ownerArmyId);
         //pobranie wszystkich tokenów nalezących do armi ktorą wybral sobie gracz
         List<ArmyTokenDto> tokensPlayer = new ArrayList<>();
-        db = openOrCreateDatabase("PracaInzynierskaTest", MODE_PRIVATE, null);
+        db = openOrCreateDatabase("PracaInzynierskaTest2", MODE_PRIVATE, null);
         Cursor c = db.rawQuery("SELECT * FROM ARMY_TOKENS_TEST WHERE ARMY_OWNER_ID = ?", new String[]{String.valueOf(ownerArmyId)});
         if (c.moveToFirst()) {
             do {
                 ArmyTokenDto armyToken = new ArmyTokenDto();
                 armyToken.setId(c.getInt(c.getColumnIndexOrThrow("Id")));
                 armyToken.setName(c.getString(c.getColumnIndexOrThrow("name")));
-                armyToken.setInitiative(c.getInt(c.getColumnIndexOrThrow("initiative")));
                 armyToken.setLife(c.getInt(c.getColumnIndexOrThrow("life")));
+                armyToken.setArmyOwnerId(c.getColumnIndexOrThrow("ARMY_OWNER_ID"));
                 tokensPlayer.add(armyToken);
             } while (c.moveToNext());
         }
@@ -316,28 +314,89 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public ArmyToken createArmyToken(ArmyTokenDto tokenDto, Context context) {
-        db = openOrCreateDatabase("PracaInzynierskaTest", MODE_PRIVATE, null);
-        Cursor c = db.rawQuery("SELECT * FROM ARMY_TOKENS_TEST WHERE ID = ?", new String[]{String.valueOf(tokenDto.getId())});
+        db = openOrCreateDatabase("PracaInzynierskaTest2", MODE_PRIVATE, null);
+        Cursor cursorToken = db.rawQuery("SELECT * FROM ARMY_TOKENS_TEST WHERE ID = ?", new String[]{String.valueOf(tokenDto.getId())});
         List<ArmyToken> armyTokens = new ArrayList<>();
-        if (c.moveToFirst()) {
+        if (cursorToken.moveToFirst()) {
             do {
                 ArmyToken armyToken = new ArmyToken(context);
-                armyToken.setId(c.getInt(c.getColumnIndexOrThrow("Id")));
-                armyToken.setName(c.getString(c.getColumnIndexOrThrow("name")));
-                armyToken.setInitiative(c.getInt(c.getColumnIndexOrThrow("initiative")));
-                armyToken.setLife(c.getInt(c.getColumnIndexOrThrow("life")));
+                armyToken.setId(cursorToken.getInt(cursorToken.getColumnIndexOrThrow("Id")));
+                armyToken.setName(cursorToken.getString(cursorToken.getColumnIndexOrThrow("name")));
+                armyToken.setInitiative(cursorToken.getInt(cursorToken.getColumnIndexOrThrow("initiative")));
+                armyToken.setLife(cursorToken.getInt(cursorToken.getColumnIndexOrThrow("life")));
+                armyToken.setArmyOwnerId(cursorToken.getColumnIndexOrThrow("ARMY_OWNER_ID"));
 
-                byte[] image = c.getBlob(c.getColumnIndexOrThrow("image"));
+                byte[] image = cursorToken.getBlob(cursorToken.getColumnIndexOrThrow("image"));
                 Bitmap bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
                 Drawable drawable = new BitmapDrawable(getResources(), bmp);
                 armyToken.setCancelDrawable(getDrawable(R.drawable.cancel));
                 armyToken.setImgToDatabase(drawable);
                 armyToken.setLayoutParams(new ViewGroup.LayoutParams((int) (mContentView.getWidth() * 0.20), (int) (mContentView.getHeight() * 0.40)));
+                armyToken.setAttacks(createTokenAttakcs(tokenDto,context));
                 armyTokens.add(armyToken);
-            } while (c.moveToNext());
+            } while (cursorToken.moveToNext());
         }
+        cursorToken.close();
+
         db.close();
-        c.close();
         return armyTokens.get(0);
+    }
+
+    private void isClickable() {
+        button.setEnabled(true);
+        button.setVisibility(View.VISIBLE);
+    }
+
+    private void makeButtonGreen() {
+        button.setEnabled(true);
+        button.setVisibility(View.VISIBLE);
+        button.setImageDrawable(getDrawable(R.drawable.ok_green));
+    }
+
+    private void noClickable() {
+        button.setEnabled(false);
+        button.setVisibility(View.GONE);
+    }
+
+    public int getPlayerNumber(String army, String message) {
+        switch (message) {
+            case "host":
+                switch (army) {
+                    case "Elf":
+                        return 1;
+                    case "Human":
+                        return 3;
+                }
+                break;
+            case "quest":
+                switch (army) {
+                    case "Elf":
+                        return 2;
+                    case "Human":
+                        return 4;
+                }
+                break;
+        }
+        return -1;
+    }
+
+    private  List<Attack> createTokenAttakcs(ArmyTokenDto tokenDto, Context context){
+        Cursor cursorAttacks = db.rawQuery("SELECT * FROM ARMY_ATTACK_TEST WHERE TOKEN_ID = ?", new String[]{String.valueOf(tokenDto.getId())});
+        List<Attack> attackList = new ArrayList<>();
+        if (cursorAttacks.moveToFirst()) {
+            do {
+                Attack attack = new Attack();
+                attack.setId(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("Id")));
+                attack.setTokenID(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("TOKEN_ID")));
+                attack.setAttackType(armyTokenUtils.getAttackFromString(cursorAttacks.getString(cursorAttacks.getColumnIndexOrThrow("ATTACK_TYPE"))));
+                attack.setStrenght(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("STRENGHT")));
+                attack.setDirections(armyTokenUtils.getDirectionFromString(cursorAttacks.getString(cursorAttacks.getColumnIndexOrThrow("DIRECTIONS"))));
+                attack.setInitiative(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("INITIATIVE")));
+                attackList.add(attack);
+            } while (cursorAttacks.moveToNext());
+        }
+        cursorAttacks.close();
+
+        return attackList;
     }
 }

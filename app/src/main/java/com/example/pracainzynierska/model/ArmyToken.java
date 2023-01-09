@@ -81,6 +81,19 @@ public class ArmyToken extends View {
      */
     private int lobbySlot;
 
+    /**
+     * Bazodanowe id armii by sprawdzać kto jest sojusznikiem
+     */
+    private int armyOwnerId;
+
+
+    public int getArmyOwnerId() {
+        return armyOwnerId;
+    }
+
+    public void setArmyOwnerId(int armyOwnerId) {
+        this.armyOwnerId = armyOwnerId;
+    }
 
     public int getLobbySlot() {
         return lobbySlot;

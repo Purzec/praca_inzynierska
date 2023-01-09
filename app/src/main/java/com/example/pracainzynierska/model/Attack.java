@@ -36,11 +36,24 @@ public class Attack {
      */
     private Directions directions;
 
+    private int initiative;
+
+    public int getInitiative() {
+        return initiative;
+    }
+
+    public void setInitiative(int initiative) {
+        this.initiative = initiative;
+    }
+
     public Attack(int id, AttackType attackType, int strenght, Directions directions) {
         this.id = id;
         this.attackType = attackType;
         this.strenght = strenght;
         this.directions = directions;
+    }
+
+    public Attack() {
     }
 
     public Attack(int id, int tokenID, AttackType attackType, int strenght, Directions directions) {

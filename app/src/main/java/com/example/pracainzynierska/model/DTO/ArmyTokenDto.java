@@ -19,15 +19,6 @@ public class ArmyTokenDto {
      */
     private String name;
 
-    /**
-     * Inicjatywa
-     */
-    private int initiative;
-
-    /**
-     * Lista ataków
-     */
-    private List<Attack> attacks;
 
     /**
      * Punkty zycia tokenu
@@ -93,21 +84,7 @@ public class ArmyTokenDto {
         this.name = name;
     }
 
-    public int getInitiative() {
-        return initiative;
-    }
 
-    public void setInitiative(int initiative) {
-        this.initiative = initiative;
-    }
-
-    public List<Attack> getAttacks() {
-        return attacks;
-    }
-
-    public void setAttacks(List<Attack> attacks) {
-        this.attacks = attacks;
-    }
 
     public int getLife() {
         return life;
@@ -136,11 +113,9 @@ public class ArmyTokenDto {
     public ArmyTokenDto() {
     }
 
-    public ArmyTokenDto(int id, String name, int initiative, List<Attack> attacks, int life, Drawable imgToDatabase, int armyOwnerId) {
+    public ArmyTokenDto(int id, String name, int life, Drawable imgToDatabase, int armyOwnerId) {
         this.id = id;
         this.name = name;
-        this.initiative = initiative;
-        this.attacks = attacks;
         this.life = life;
         this.imgToDatabase = imgToDatabase;
         this.armyOwnerId = armyOwnerId;

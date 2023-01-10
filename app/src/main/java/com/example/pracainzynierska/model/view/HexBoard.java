@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import com.example.pracainzynierska.model.Hex;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HexBoard extends View {
     public HexBoard(Context context) {
@@ -139,7 +140,7 @@ public class HexBoard extends View {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 
-    public ArrayList<Hex> pobierzKordy() {
+    public List<Hex> pobierzKordy() {
 
         hex1.setId(0);
         lista.add(hex1);

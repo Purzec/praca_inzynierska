@@ -7,9 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+
 import com.example.pracainzynierska.R;
 import com.example.pracainzynierska.commons.HexUtils;
+import com.example.pracainzynierska.model.gameStatus.Board;
 import com.example.pracainzynierska.model.gameStatus.Player;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
 
@@ -35,10 +41,6 @@ public class ArmyToken extends View {
      */
     private String name;
 
-    /**
-     * Inicjatywa
-     */
-    private int initiative;
 
     /**
      * Lista ataków
@@ -150,13 +152,6 @@ public class ArmyToken extends View {
         this.name = name;
     }
 
-    public int getInitiative() {
-        return initiative;
-    }
-
-    public void setInitiative(int initiative) {
-        this.initiative = initiative;
-    }
 
     public List<Attack> getAttacks() {
         return attacks;
@@ -199,9 +194,10 @@ public class ArmyToken extends View {
         this.draftDiscard = draftDiscard;
     }
 
-    public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola, Player player) {
+    public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola, Player player, DatabaseReference databaseReference, Board board) {
 // pobierz rozmiary ekrany
         //dodać przyciski obrotu ekranu
+        board.setUpdating(true);
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(viewGroup.getWidth() / 10, viewGroup.getHeight() / 5);
         ImageView leftArrow = new ImageView(context);
         leftArrow.setImageDrawable(context.getDrawable(R.drawable.arrow));
@@ -279,13 +275,29 @@ public class ArmyToken extends View {
             @Override
             public void onClick(View view) {
                 hexList.get(idPola).setBusy(true);
-                hexList.get(idPola).setArmyToken(armyToken);
+                hexList.get(idPola).setTokenID(armyToken.getId());
                 viewGroup.removeView(ok);
                 viewGroup.removeView(no);
                 viewGroup.removeView(leftArrow);
                 viewGroup.removeView(rightArrow);
                 armyToken.setOnTouchListener(null);
                 armyToken.setOnBoard(true);
+                player.getLobby().remove(armyToken);
+                databaseReference.updateChildren(board.toMap())
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                // operacja zakończyła się powodzeniem
+                                System.out.println("sukces");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // operacja nie powiodła się
+                                System.out.println("bład");
+                            }
+                        });
             }
         });
 
@@ -298,7 +310,7 @@ public class ArmyToken extends View {
                 viewGroup.removeView(leftArrow);
                 viewGroup.removeView(rightArrow);
                 HexUtils.goToLobbySlot(armyToken);
-                armyToken.setOnTouchListener(HexUtils.onTouchListener(armyToken,hexList,viewGroup,context,player));
+                armyToken.setOnTouchListener(HexUtils.onTouchListener(armyToken,hexList,viewGroup,context,player,databaseReference,board));
             }
         });
 

@@ -33,6 +33,7 @@ import com.example.pracainzynierska.model.view.HexBoard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class TutorialActivity extends AppCompatActivity implements View.OnClickListener {
@@ -44,7 +45,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
     private ArmyToken playerBase;
     private ViewGroup viewGroup;
     private HexBoard hexBoard;
-    private ArrayList<Hex> listatest;
+    private List<Hex> listatest;
     private int etap = 1;
     private int bylo = 0;
 
@@ -220,7 +221,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
                         break;
                     case MotionEvent.ACTION_UP:
                         int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
-                        tokenG.confirmPositionToken(viewGroup, getApplicationContext(), tokenG, listatest, idPola, player);
+                      //  tokenG.confirmPositionToken(viewGroup, getApplicationContext(), tokenG, listatest, idPola, player,);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         System.out.println("ACTION_MOVE");

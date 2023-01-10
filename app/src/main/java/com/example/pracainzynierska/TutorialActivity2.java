@@ -53,7 +53,7 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
     private ImageButton infoButton;
     private ImageButton nextButton;
     private ArmyToken playerBase;
-    private ArrayList<Hex> listatest;
+    private List<Hex> listatest;
     private ViewGroup viewGroup;
     private ViewGroup relativeLayout;
     private HexBoard hexBoard;
@@ -151,21 +151,12 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
             case R.id.closeButton:
                 imgWithButton.setVisibility(View.INVISIBLE);
                 getQuiz(etap);
-
                 break;
-            /*case R.id.infoButton:
-                imgWithButton.setVisibility(View.VISIBLE);
-                System.out.println(imgWithButton.getLayoutParams().width);
-                System.out.println(imgWithButton.getLayoutParams().height);
-                imgWithButton.setX((float) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.2));
-                imgWithButton.setY((float) (Resources.getSystem().getDisplayMetrics().heightPixels * 0.10));
-                imgWithButton.bringToFront();
-                break;*/
+
             case R.id.nextButton:
                           startActivity(new Intent(TutorialActivity2.this, MenuActivity.class));
                 break;
             case R.id.acceptDraft:
-//sprawdzamy czy odrzucił jeden token conajmniej
                 if (player.getDraft().stream().allMatch(ArmyToken::isDraftDiscard)) {
                     Toast.makeText(getApplicationContext(), "KLIKNĄŁEŚ WSZYSTKIE TOKENY CONAJMNIEJ JEDEN MUSISZ DOBRAĆ", Toast.LENGTH_SHORT).show();
                 } else if (player.getDraft().stream().anyMatch(ArmyToken::isDraftDiscard)) {
@@ -174,7 +165,7 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                     player.setLobby(player.getDraft().stream().filter(armyToken -> !armyToken.isDraftDiscard()).collect(Collectors.toList()));
                     Toast.makeText(getApplicationContext(), String.valueOf(player.getLobby().size()), Toast.LENGTH_SHORT).show();
                     player.getDraft().stream().forEach(armyToken -> draft.removeView(armyToken));
-                    HexUtils.setToLobby(player.getLobby(), relativeLayout,listatest,getApplicationContext(),player);
+                  //  HexUtils.setToLobby(player.getLobby(), relativeLayout,listatest,getApplicationContext(),player);
                     draft.setVisibility(View.GONE);
                 } else if (player.getDraft().stream().noneMatch(ArmyToken::isDraftDiscard)) {
                     Toast.makeText(getApplicationContext(), "MUSISZ ODRZUCIĆ CONAJMNIEJ JEDEN TOKEN", Toast.LENGTH_SHORT).show();
@@ -200,7 +191,6 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                         ArmyToken armyToken = new ArmyToken(getApplicationContext());
                         armyToken.setId(c.getInt(c.getColumnIndexOrThrow("Id")));
                         armyToken.setName(c.getString(c.getColumnIndexOrThrow("name")));
-                        armyToken.setInitiative(c.getInt(c.getColumnIndexOrThrow("initiative")));
                         armyToken.setLife(c.getInt(c.getColumnIndexOrThrow("life")));
 
                         byte[] image = c.getBlob(c.getColumnIndexOrThrow("image"));
@@ -220,7 +210,7 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                 acceptButton.setOnClickListener(this);
                 draft.setVisibility(View.VISIBLE);
                 // pobieramy do 3 tokenów zaleznie od tego ile jest w lobby z listy dostepnych
-                player.setDraft(HexUtils.setToDraft(3, tokensPlayer, new ArrayList<>(), draft));
+              //  player.setDraft(HexUtils.setToDraft(3, tokensPlayer, new ArrayList<>(), draft));
 
 
 

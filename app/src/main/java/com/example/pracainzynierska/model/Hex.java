@@ -28,16 +28,9 @@ public class Hex{
     static float systemWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     static float systemHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
     private ImageView imageView;
-    private ArmyToken armyToken;
+    private int tokenID;
 
 
-
-    /*    private HexDirection hexForward = HexDirection.FORWARD;
-    private HexDirection forwardRight = HexDirection.FORWARD_RIGHT;
-    private HexDirection forwardLeft = HexDirection.FORWARD_LEFT;
-    private HexDirection back = HexDirection.BACK;
-    private HexDirection backLeft = HexDirection.BACK_LEFT;
-    private HexDirection backRight = HexDirection.BACK_RIGHT;*/
 
 
     public Hex() {
@@ -148,11 +141,11 @@ public class Hex{
         this.id = id;
     }
 
-    public ArmyToken getArmyToken() {
-        return armyToken;
+    public int getTokenID() {
+        return tokenID;
     }
 
-    public void setArmyToken(ArmyToken armyToken) {
-        this.armyToken = armyToken;
+    public void setTokenID(int tokenID) {
+        this.tokenID = tokenID;
     }
 }

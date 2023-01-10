@@ -1,7 +1,5 @@
 package com.example.pracainzynierska;
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
@@ -20,15 +18,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
+import android.text.style.UpdateLayout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.pracainzynierska.commons.ArmyTokenUtils;
 import com.example.pracainzynierska.commons.HexUtils;
@@ -51,7 +51,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -60,17 +63,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     List<ArmyTokenDto> tmpArmy;
     ListView listView;
     ImageButton button;
+    Button acceptButtonDraft;
     String playerName = "";
     String roomName = "";
     String role = "";
     FirebaseDatabase database;
     DatabaseReference room, messageRef;
-    RelativeLayout waiting, listViewArmy;
+    RelativeLayout waiting, listViewArmy, draftView;
     ConstraintLayout boardView;
     Board board = new Board();
     HexBoard hexBoard;
     ArmyTokenUtils armyTokenUtils = new ArmyTokenUtils();
-
+    HexUtils hexUtils = new HexUtils();
+    List<Hex> localHexList;
+    private boolean stopThread = false;
 
     private static final String HOST = "host";
     private static final String QUEST = "quest";
@@ -116,6 +122,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             hide();
         }
     };
+    private List<ArmyTokenDto> chosenArmy;
 
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
@@ -161,7 +168,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             roomName = extras.getString("roomName");
             if (roomName.equals(playerName)) {
                 role = "host";
-                //dodac tutaj inicjalizacje pola hexów u ktoregoś z graczy
             } else {
                 role = "quest";
             }
@@ -169,9 +175,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         hexBoard = findViewById(R.id.hexBoard);
         listViewArmy = findViewById(R.id.listViewArmy);
         listView = findViewById(R.id.listArmy);
-
+        draftView = findViewById(R.id.draft);
+        acceptButtonDraft = findViewById(R.id.acceptDraft);
+        acceptButtonDraft.setOnClickListener(this);
         if (savedInstanceState == null) {
-
+            if (roomName.equals(playerName)) {
+                board.setHexBoard(hexBoard.pobierzKordy());
+            }
             messageRef = FirebaseDatabase.getInstance().getReference("rooms/" + roomName);
 
             messageRef.addValueEventListener(new ValueEventListener() {
@@ -192,9 +202,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         board.setPlayer2(dataSnapshot.child("player2").getValue(Player.class));
                     }
-                    board.setHexBoard(dataSnapshot.child("hexBoard").getValue(new GenericTypeIndicator<List<Hex>>() {
-                    }));
+                    if (dataSnapshot.child("hexBoard").getValue() != null) {
+                        localHexList = board.getHexBoard();
+                        board.setHexBoard(dataSnapshot.child("hexBoard").getValue(new GenericTypeIndicator<List<Hex>>() {
+                        }));
+                    }
+
+                    updateView(board, localHexList);
                     game(board);
+
                 }
 
                 @Override
@@ -202,6 +218,26 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     System.out.println("bład");
                 }
             });
+        }
+    }
+
+    private void updateView(Board board, List<Hex> localHexList) {
+        //mamy dwie listy lokalną i aktualną na bazie
+        if (localHexList != null) {
+            List<Hex> localBusyHex = localHexList.stream().filter(Hex::isBusy).collect(Collectors.toList());
+            List<Hex> globalBusyHex = board.getHexBoard().stream().filter(Hex::isBusy).collect(Collectors.toList());
+            Set<Integer> firstListIds = localBusyHex.stream().map(Hex::getTokenID).collect(Collectors.toSet());
+            List<Hex> idToGenerate = globalBusyHex.stream()
+                    .filter(e -> !firstListIds.contains(e.getTokenID()))
+                    .collect(Collectors.toList());
+            for (Hex hex : idToGenerate) {
+                ArmyTokenDto tokenByID = getTokenByID(hex.getTokenID());
+                ArmyToken armyToken = createArmyToken(tokenByID, getApplicationContext(), mContentView);
+                HexUtils.setHexToBoard(board.getHexBoard(), armyToken, hex.getId());
+                armyToken.setVisibility(View.VISIBLE);
+                boardView.addView(armyToken);
+                armyToken.setOnTouchListener(null);
+            }
         }
     }
 
@@ -213,17 +249,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 if (board.getMessage().equals("host")) {
                     System.out.println("Ekran widzi gracz: " + board.getPlayer1().getNick());
                     gameTurn(board.getPlayer1());
+                    isClickable(board.getPlayer1());
                 }
             } else {
                 if (board.getMessage().equals("quest")) {
                     System.out.println("Ekran widzi gracz: " + board.getPlayer2().getNick());
                     gameTurn(board.getPlayer2());
+                    isClickable(board.getPlayer2());
                 }
             }
         }
     }
 
     private void gameTurn(Player player) {
+        //zrobić zabezpieczenie zeby wykonywało sie tylko w sytuacji kiedy klikamy endturn
         switch (player.getEtap()) {
             case 1:
                 if (player.getChosenArmy() == null) {
@@ -237,37 +276,107 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             listViewArmy.setVisibility(View.GONE);
                             player.setEtap(2);
                             String chosenArmy = armyList.get(i);
-                            player.setChosenArmy(armyTokenGet(getPlayerNumber(chosenArmy,board.getMessage())));
-                            isClickable();
-                            makeButtonGreen();
+                            player.setChosenArmy(armyTokenGet(getPlayerNumber(chosenArmy, board.getMessage())));
+                            endTurn(view);
                         }
                     });
                 }
                 break;
             case 2:
-                isClickable();
+                player.setFlag(false);
+                ArmyToken armyTokens = createArmyToken(getBoss(player.getChosenArmy()), getApplicationContext(), mContentView);
+                HexUtils.setToLobby(Collections.singletonList(armyTokens), boardView, board.getHexBoard(), getApplicationContext(), player, messageRef, board);
+                armyTokens.setVisibility(View.VISIBLE);
                 System.out.println("postawienie dowódcy");
+                //zrobic usuniecie dowodcy z armii
+
+                player.setEtap(3);
                 break;
             default:
-                isClickable();
-                System.out.println("tury normalne");
+                if (!board.isUpdating()) {
+                    noClickable();
+                    System.out.println("tury normalne");
+                    //draft steworzenie 3 losowych tokenoów i usuniecie ich z listy
+                    List<ArmyToken> random3Tokens = createArmyTokens(pickRandomElements(player.getChosenArmy()), getApplicationContext(), mContentView);
+                    draftView.setVisibility(View.VISIBLE);
+                    draftView.bringToFront();
+                    HexUtils.setToDraft(random3Tokens, draftView);
+                    //usuniecie z listy pozostałych do wykorzystania
+                    //dodanie do lobby
+                    //sprawdzenie czy plansza jest pełna
+                    //jak lobby jest puste to
+                    //dodanie do lobby
+                }
                 break;
         }
     }
 
+    public static List<ArmyTokenDto> pickRandomElements(List<ArmyTokenDto> list) {
+        Random rand = new Random();
+        List<ArmyTokenDto> result = new ArrayList<>();
+        int size = list.size();
+        if (size <= 3) {
+            return list;
+        }
+        for (int i = 0; i < 3; i++) {
+            int randomIndex = rand.nextInt(list.size());
+            result.add(list.get(randomIndex));
+            list.remove(randomIndex);
+        }
+        return result;
+    }
+
+    private ArmyTokenDto getBoss(List<ArmyTokenDto> chosenArmy) {
+        return chosenArmy.stream().filter(tokenDto -> tokenDto.getName().equals("dowodca")).findFirst().get();
+    }
+
     @Override
     public void onClick(View view) {
-        endTurn(view);
+        switch (view.getId()) {
+            case R.id.acceptDraft:
+                System.out.println("1");
+                // player flaga ustawic na true
+                draftView.setVisibility(View.GONE);
+                if (role.equals("host")) {
+                    if (board.getMessage().equals("host")) {
+                        test(board.getPlayer1());
+                    }
+                } else {
+                    if (board.getMessage().equals("quest")) {
+                        test(board.getPlayer2());
+                    }
+                }
+
+                break;
+            case R.id.finishRound:
+                endTurn(view);
+                break;
+        }
+    }
+
+    public void test(Player player) {
+        System.out.println("2");
+        if (player.getDraft().stream().allMatch(ArmyToken::isDraftDiscard)) {
+            Toast.makeText(getApplicationContext(), "KLIKNĄŁEŚ WSZYSTKIE TOKENY CONAJMNIEJ JEDEN MUSISZ DOBRAĆ", Toast.LENGTH_SHORT).show();
+        } else if (player.getDraft().stream().anyMatch(ArmyToken::isDraftDiscard)) {
+            //  draft.setVisibility(View.GONE);
+            //dodaj do lobby
+            player.setLobby(player.getDraft().stream().filter(armyToken -> !armyToken.isDraftDiscard()).collect(Collectors.toList()));
+            Toast.makeText(getApplicationContext(), String.valueOf(player.getLobby().size()), Toast.LENGTH_SHORT).show();
+            player.getDraft().stream().forEach(armyToken -> draftView.removeView(armyToken));
+            HexUtils.setToLobby(player.getLobby(), boardView, board.getHexBoard(), getApplicationContext(), player, messageRef, board);
+            draftView.setVisibility(View.GONE);
+        } else if (player.getDraft().stream().noneMatch(ArmyToken::isDraftDiscard)) {
+            Toast.makeText(getApplicationContext(), "MUSISZ ODRZUCIĆ CONAJMNIEJ JEDEN TOKEN", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void endTurn(View view) {
-
+        board.setUpdating(false);
         if (board.getMessage().equals("quest")) {
-            // jeśli tak, to ustaw ture gracza "quest" i wiadomość "quest"
             noClickable();
             board.setMessage("host");
         } else {
-            // w przeciwnym razie ustaw ture gracza "host" i wiadomość "host"
             noClickable();
             board.setMessage("quest");
         }
@@ -291,66 +400,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public List<ArmyTokenDto> armyTokenGet(int ownerArmyId) {
 
-        System.out.println(ownerArmyId);
-        //pobranie wszystkich tokenów nalezących do armi ktorą wybral sobie gracz
-        List<ArmyTokenDto> tokensPlayer = new ArrayList<>();
-        db = openOrCreateDatabase("PracaInzynierskaTest2", MODE_PRIVATE, null);
-        Cursor c = db.rawQuery("SELECT * FROM ARMY_TOKENS_TEST WHERE ARMY_OWNER_ID = ?", new String[]{String.valueOf(ownerArmyId)});
-        if (c.moveToFirst()) {
-            do {
-                ArmyTokenDto armyToken = new ArmyTokenDto();
-                armyToken.setId(c.getInt(c.getColumnIndexOrThrow("Id")));
-                armyToken.setName(c.getString(c.getColumnIndexOrThrow("name")));
-                armyToken.setLife(c.getInt(c.getColumnIndexOrThrow("life")));
-                armyToken.setArmyOwnerId(c.getColumnIndexOrThrow("ARMY_OWNER_ID"));
-                tokensPlayer.add(armyToken);
-            } while (c.moveToNext());
+    private void isClickable(Player player) {
+        if (player.getLobby().size() == 0 && player.getEtap() >= 2) {
+            button.setEnabled(true);
+            button.setVisibility(View.VISIBLE);
+            button.setImageDrawable(getDrawable(R.drawable.ok_green));
         }
-        db.close();
-        c.close();
-        return tokensPlayer;
-    }
-
-    public ArmyToken createArmyToken(ArmyTokenDto tokenDto, Context context) {
-        db = openOrCreateDatabase("PracaInzynierskaTest2", MODE_PRIVATE, null);
-        Cursor cursorToken = db.rawQuery("SELECT * FROM ARMY_TOKENS_TEST WHERE ID = ?", new String[]{String.valueOf(tokenDto.getId())});
-        List<ArmyToken> armyTokens = new ArrayList<>();
-        if (cursorToken.moveToFirst()) {
-            do {
-                ArmyToken armyToken = new ArmyToken(context);
-                armyToken.setId(cursorToken.getInt(cursorToken.getColumnIndexOrThrow("Id")));
-                armyToken.setName(cursorToken.getString(cursorToken.getColumnIndexOrThrow("name")));
-                armyToken.setInitiative(cursorToken.getInt(cursorToken.getColumnIndexOrThrow("initiative")));
-                armyToken.setLife(cursorToken.getInt(cursorToken.getColumnIndexOrThrow("life")));
-                armyToken.setArmyOwnerId(cursorToken.getColumnIndexOrThrow("ARMY_OWNER_ID"));
-
-                byte[] image = cursorToken.getBlob(cursorToken.getColumnIndexOrThrow("image"));
-                Bitmap bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
-                Drawable drawable = new BitmapDrawable(getResources(), bmp);
-                armyToken.setCancelDrawable(getDrawable(R.drawable.cancel));
-                armyToken.setImgToDatabase(drawable);
-                armyToken.setLayoutParams(new ViewGroup.LayoutParams((int) (mContentView.getWidth() * 0.20), (int) (mContentView.getHeight() * 0.40)));
-                armyToken.setAttacks(createTokenAttakcs(tokenDto,context));
-                armyTokens.add(armyToken);
-            } while (cursorToken.moveToNext());
-        }
-        cursorToken.close();
-
-        db.close();
-        return armyTokens.get(0);
-    }
-
-    private void isClickable() {
-        button.setEnabled(true);
-        button.setVisibility(View.VISIBLE);
     }
 
     private void makeButtonGreen() {
         button.setEnabled(true);
         button.setVisibility(View.VISIBLE);
-        button.setImageDrawable(getDrawable(R.drawable.ok_green));
+        button.setImageDrawable(getDrawable(R.drawable.ok));
     }
 
     private void noClickable() {
@@ -380,17 +442,98 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         return -1;
     }
 
-    private  List<Attack> createTokenAttakcs(ArmyTokenDto tokenDto, Context context){
+    public ArmyTokenDto getTokenByID(int tokenID) {
+
+        System.out.println(tokenID);
+        //pobranie wszystkich tokenów nalezących do armi ktorą wybral sobie gracz
+        ArmyTokenDto armyToken = new ArmyTokenDto();
+        db = openOrCreateDatabase("PracaInzynierskaTest2", MODE_PRIVATE, null);
+        Cursor c = db.rawQuery("SELECT * FROM ARMY_TOKENS_TEST WHERE ID = ?", new String[]{String.valueOf(tokenID)});
+        if (c.moveToFirst()) {
+            do {
+
+                armyToken.setId(c.getInt(c.getColumnIndexOrThrow("Id")));
+                armyToken.setName(c.getString(c.getColumnIndexOrThrow("name")));
+                armyToken.setLife(c.getInt(c.getColumnIndexOrThrow("life")));
+                armyToken.setArmyOwnerId(c.getColumnIndexOrThrow("ARMY_OWNER_ID"));
+
+            } while (c.moveToNext());
+        }
+        db.close();
+        c.close();
+        return armyToken;
+    }
+
+    public List<ArmyTokenDto> armyTokenGet(int ownerArmyId) {
+        System.out.println(ownerArmyId);
+        //pobranie wszystkich tokenów nalezących do armi ktorą wybral sobie gracz
+        List<ArmyTokenDto> tokensPlayer = new ArrayList<>();
+        db = openOrCreateDatabase("PracaInzynierskaTest2", MODE_PRIVATE, null);
+        Cursor c = db.rawQuery("SELECT * FROM ARMY_TOKENS_TEST WHERE ARMY_OWNER_ID = ?", new String[]{String.valueOf(ownerArmyId)});
+        if (c.moveToFirst()) {
+            do {
+                ArmyTokenDto armyToken = new ArmyTokenDto();
+                armyToken.setId(c.getInt(c.getColumnIndexOrThrow("Id")));
+                armyToken.setName(c.getString(c.getColumnIndexOrThrow("name")));
+                armyToken.setLife(c.getInt(c.getColumnIndexOrThrow("life")));
+                armyToken.setArmyOwnerId(c.getColumnIndexOrThrow("ARMY_OWNER_ID"));
+                tokensPlayer.add(armyToken);
+            } while (c.moveToNext());
+        }
+        db.close();
+        c.close();
+        return tokensPlayer;
+    }
+
+
+    public List<ArmyToken> createArmyTokens(List<ArmyTokenDto> armyTokenDtoList, Context context, View view) {
+        List<ArmyToken> result = new ArrayList<>();
+        for (ArmyTokenDto tokenDto : armyTokenDtoList) {
+            ArmyToken armyToken = createArmyToken(tokenDto, context, mContentView);
+            result.add(armyToken);
+        }
+        return result;
+    }
+
+    public ArmyToken createArmyToken(ArmyTokenDto tokenDto, Context context, View view) {
+        db = openOrCreateDatabase("PracaInzynierskaTest2", MODE_PRIVATE, null);
+        Cursor cursorToken = db.rawQuery("SELECT * FROM ARMY_TOKENS_TEST WHERE ID = ?", new String[]{String.valueOf(tokenDto.getId())});
+        ArmyToken armyToken = new ArmyToken(context);
+        if (cursorToken.moveToFirst()) {
+            do {
+                armyToken.setId(cursorToken.getInt(cursorToken.getColumnIndexOrThrow("Id")));
+                armyToken.setName(cursorToken.getString(cursorToken.getColumnIndexOrThrow("name")));
+                armyToken.setLife(cursorToken.getInt(cursorToken.getColumnIndexOrThrow("life")));
+                armyToken.setArmyOwnerId(cursorToken.getColumnIndexOrThrow("ARMY_OWNER_ID"));
+
+                byte[] image = cursorToken.getBlob(cursorToken.getColumnIndexOrThrow("image"));
+                Bitmap bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+                Drawable drawable = new BitmapDrawable(getResources(), bmp);
+                armyToken.setCancelDrawable(getDrawable(R.drawable.cancel));
+                armyToken.setImgToDatabase(drawable);
+                armyToken.setBackground(armyToken.getImgToDatabase());
+                armyToken.setLayoutParams(new ViewGroup.LayoutParams((int) (view.getWidth() / 10), (int) (view.getHeight() / 5)));
+                armyToken.setAttacks(createTokenAttakcs(tokenDto));
+
+            } while (cursorToken.moveToNext());
+        }
+        cursorToken.close();
+        db.close();
+        armyToken.setVisibility(View.INVISIBLE);
+        return armyToken;
+    }
+
+    private List<Attack> createTokenAttakcs(ArmyTokenDto tokenDto) {
         Cursor cursorAttacks = db.rawQuery("SELECT * FROM ARMY_ATTACK_TEST WHERE TOKEN_ID = ?", new String[]{String.valueOf(tokenDto.getId())});
         List<Attack> attackList = new ArrayList<>();
         if (cursorAttacks.moveToFirst()) {
             do {
                 Attack attack = new Attack();
-                attack.setId(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("Id")));
+                attack.setId(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("ID")));
                 attack.setTokenID(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("TOKEN_ID")));
-                attack.setAttackType(armyTokenUtils.getAttackFromString(cursorAttacks.getString(cursorAttacks.getColumnIndexOrThrow("ATTACK_TYPE"))));
+                attack.setAttackType(ArmyTokenUtils.getAttackFromString(cursorAttacks.getString(cursorAttacks.getColumnIndexOrThrow("ATTACK_TYPE"))));
                 attack.setStrenght(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("STRENGHT")));
-                attack.setDirections(armyTokenUtils.getDirectionFromString(cursorAttacks.getString(cursorAttacks.getColumnIndexOrThrow("DIRECTIONS"))));
+                attack.setDirections(ArmyTokenUtils.getDirectionFromString(cursorAttacks.getString(cursorAttacks.getColumnIndexOrThrow("DIRECTIONS"))));
                 attack.setInitiative(cursorAttacks.getInt(cursorAttacks.getColumnIndexOrThrow("INITIATIVE")));
                 attackList.add(attack);
             } while (cursorAttacks.moveToNext());
@@ -399,4 +542,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         return attackList;
     }
+
+    private void lobbyEmpty(Player player) {
+        if (player.getLobby().isEmpty()) {
+            makeButtonGreen();
+        }
+    }
+
 }

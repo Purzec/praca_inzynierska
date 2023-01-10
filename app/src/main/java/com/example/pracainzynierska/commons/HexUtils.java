@@ -19,9 +19,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.pracainzynierska.R;
 import com.example.pracainzynierska.model.ArmyToken;
+import com.example.pracainzynierska.model.Attack;
 import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
 import com.example.pracainzynierska.model.Hex;
+import com.example.pracainzynierska.model.gameStatus.Board;
 import com.example.pracainzynierska.model.gameStatus.Player;
+import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +36,7 @@ public class HexUtils extends Application {
 
     static float systemWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     static float systemHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-
+    SQLiteDatabase db;
 
     public static ArmyToken setHexToBoard(List<Hex> hex, ArmyToken armyToken, int idPola) {
         armyToken.setX(hex.get(idPola).getHexpositionX() - armyToken.getLayoutParams().width / 2);
@@ -42,12 +45,15 @@ public class HexUtils extends Application {
         return armyToken;
     }
 
-    //3,
-    public static void setToLobby(List<ArmyToken> armyTokens, ViewGroup relativeLayout, List<Hex> listatest, Context context, Player player) {
-        int slot = 0;
-
-        for (ArmyToken armyToken : armyTokens) {
-            armyToken.setLayoutParams(new ViewGroup.LayoutParams(relativeLayout.getWidth() / 10, relativeLayout.getHeight() / 5));
+    public static void setToLobby(List<ArmyToken> armyTokens, ViewGroup viewgroup, List<Hex> listatest, Context context, Player player, DatabaseReference databaseReference,Board board) {
+        int slot =0;
+        List<ArmyToken> lobby = player.getLobby();
+        List<ArmyToken> merge = new ArrayList<>();
+        merge.addAll(armyTokens);
+        merge.addAll(lobby);
+        player.setLobby(merge);
+        for (ArmyToken armyToken : merge) {
+            armyToken.setLayoutParams(new ViewGroup.LayoutParams(viewgroup.getWidth() / 10, viewgroup.getHeight() / 5));
             float centerHeightImageView = armyToken.getLayoutParams().height / 2;
             float centerWidthImageView = armyToken.getLayoutParams().width / 2;
             armyToken.setX(systemWidth / 10 - centerWidthImageView);
@@ -66,22 +72,21 @@ public class HexUtils extends Application {
                     break;
             }
             slot++;
-            relativeLayout.addView(armyToken);
+            viewgroup.addView(armyToken);
             armyToken.setOnClickListener(null);
-            armyToken.setOnTouchListener(onTouchListener(armyToken, listatest, relativeLayout, context, player));
+            armyToken.setOnTouchListener(onTouchListener(armyToken, listatest, viewgroup, context, player,databaseReference,board));
         }
     }
 
-    public static List<ArmyToken> setToDraft(int selectableTokenQuantity, List<ArmyToken> armyTokensPool, List<ArmyToken> armyTokensdiscard, RelativeLayout lobby) {
-        // pobierz ustaloną liczbę losowych tokenów do lobby
-        List<ArmyToken> draftLobby = new ArrayList<>();
-        for (int i = 0; i < selectableTokenQuantity; i++) {
-            draftLobby.add(takeRandomObjectFromList(armyTokensPool));
-        }
-
+    public static void setToDraft(List<ArmyToken> randomToken, RelativeLayout lobby) {
         int slot = 1;
-        for (ArmyToken armyToken : draftLobby) {
+        for (ArmyToken armyToken : randomToken) {
+            armyToken
+                    .setLayoutParams(new ViewGroup.LayoutParams((int)
+                            (lobby.getWidth() * 0.30), (int) (lobby.getHeight() * 0.40)));
+
             armyToken.setBackground(armyToken.getImgToDatabase());
+            armyToken.setVisibility(View.VISIBLE);
             //dodać plany jak kliklniesz
             armyToken.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -98,7 +103,6 @@ public class HexUtils extends Application {
             lobby.addView(setToDraftSlot(lobby, armyToken, slot));
             slot++;
         }
-        return draftLobby;
     }
 
 
@@ -164,7 +168,7 @@ public class HexUtils extends Application {
     }
 
 
-    public static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context, Player player) {
+    public static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context, Player player, DatabaseReference databaseReference, Board board) {
 
         return new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -181,7 +185,7 @@ public class HexUtils extends Application {
                     case MotionEvent.ACTION_UP:
                         System.out.println("ACTION_UP");
                         int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
-                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, listatest, idPola, player);
+                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, listatest, idPola, player,databaseReference, board);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         System.out.println("ACTION_MOVE");

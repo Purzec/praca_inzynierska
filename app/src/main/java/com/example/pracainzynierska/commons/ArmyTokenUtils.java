@@ -233,6 +233,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         Drawable drawable7 = context.getApplicationContext().getDrawable(R.drawable.token7b);
         Drawable drawable8 = context.getApplicationContext().getDrawable(R.drawable.token8b);
         Drawable drawable9 = context.getApplicationContext().getDrawable(R.drawable.token9b);
+        Drawable drawable10 = context.getApplicationContext().getDrawable(R.drawable.token10c);
 
         List<ArmyTokenDto> armyTokenDtoList = new ArrayList<>();
 
@@ -434,6 +435,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         Drawable drawable7 = context.getApplicationContext().getDrawable(R.drawable.token7c);
         Drawable drawable8 = context.getApplicationContext().getDrawable(R.drawable.token8c);
         Drawable drawable9 = context.getApplicationContext().getDrawable(R.drawable.token9c);
+        Drawable drawable10 = context.getApplicationContext().getDrawable(R.drawable.token10c);
 
         List<ArmyTokenDto> armyTokenDtoList = new ArrayList<>();
 
@@ -470,7 +472,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         ArmyTokenDto tokenDto24 = new ArmyTokenDto(73, "szeregowy", 1, drawable9, 3);
         ArmyTokenDto tokenDto25 = new ArmyTokenDto(74, "szeregowy", 1, drawable9, 3);
 
-        ArmyTokenDto tokenDto7 = new ArmyTokenDto(75, "dowodca", 20, drawable3, 3);
+        ArmyTokenDto tokenDto7 = new ArmyTokenDto(75, "dowodca", 20, drawable10, 3);
 
         armyTokenDtoList.add(tokenDto1);
         armyTokenDtoList.add(tokenDto2);
@@ -578,7 +580,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
 
         return armyTokenDtoList;
     }
-
+//todo armia ludzi ma bład
     public List<AttackDto> initHumanArmyAttackC() {
         AttackDto attack1 = new AttackDto(104, 51, AttackType.SHORT, 1, Directions.FORWARD, 3);
         AttackDto attack2 = new AttackDto(105, 52, AttackType.SHORT, 1, Directions.FORWARD, 3);
@@ -775,7 +777,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         return attacks;
     }
 
-    public AttackType getAttackFromString(String attack) {
+    public static AttackType getAttackFromString(String attack) {
         if (attack.equals("SHORT")) {
             return AttackType.SHORT;
         } else {
@@ -783,7 +785,7 @@ public class ArmyTokenUtils extends AppCompatActivity {
         }
     }
 
-    public Directions getDirectionFromString(String direction) {
+    public static Directions getDirectionFromString(String direction) {
         switch (direction) {
             case "FORWARD":
                 return Directions.FORWARD;

@@ -109,6 +109,8 @@ public class RoomList extends Fragment {
                 button.setEnabled(false);
                 messRef = database.getReference("rooms/" + roomName +"/message");
                 messRef.setValue("host");
+                messRef = database.getReference("rooms/" + roomName +"/lastRound");
+                messRef.setValue(false);
                 roomName = player.getNick();
                 roomRef = database.getReference("rooms/" + roomName + "/p1info");
                 addRoomEventListener();

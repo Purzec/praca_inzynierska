@@ -1,8 +1,8 @@
 package com.example.pracainzynierska.model.gameStatus;
 
 import com.example.pracainzynierska.model.Hex;
-import com.example.pracainzynierska.model.view.HexBoard;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class Board {
 
     private Player player2;
 
-    private String round;
+    private boolean lastRound = false;
 
     private boolean updating;
 
@@ -53,12 +53,12 @@ public class Board {
         this.updating = updating;
     }
 
-    public String getRound() {
-        return round;
+    public boolean isLastRound() {
+        return lastRound;
     }
 
-    public void setRound(String round) {
-        this.round = round;
+    public void setLastRound(boolean lastRound) {
+        this.lastRound = lastRound;
     }
 
     public Player getPlayer1() {
@@ -97,11 +97,15 @@ public class Board {
         HashMap<String, Object> result = new HashMap<>();
         result.put("p1info", p1info);
         result.put("p2info", p2info);
-        result.put("hexBoard", hexBoard);
+        List<Map<String, Object>> hexBoardMap = new ArrayList<>();
+        for (Hex hex : hexBoard) {
+            hexBoardMap.add(hex.toMap());
+        }
+        result.put("hexBoard", hexBoardMap);
         result.put("player1", player1);
         result.put("message", message);
         result.put("player2", player2);
-        result.put("round", round);
+        result.put("lastRound", lastRound);
         result.put("updating", updating);
         return result;
     }

@@ -14,13 +14,15 @@ import com.example.pracainzynierska.commons.HexUtils;
 import com.example.pracainzynierska.model.enums.Directions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-public class Hex{
+public class Hex {
 
     private int id;
-    private List<Hex> neighbours;
+    private Map<String, Integer> neighbours = new HashMap<>();
     private List<Directions> directionList;
     private float HexpositionX;
     private float HexpositionY;
@@ -29,26 +31,7 @@ public class Hex{
     static float systemHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
     private ImageView imageView;
     private int tokenID;
-
-
-
-
-    public Hex() {
-        this.directionList = new ArrayList<Directions>(6);
-        this.neighbours = new ArrayList<Hex>(6);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.directionList.add(0, Directions.FORWARD);
-        this.directionList.add(1, Directions.FORWARD_RIGHT);
-        this.directionList.add(2, Directions.BACK_RIGHT);
-        this.directionList.add(3, Directions.BACK);
-        this.directionList.add(4, Directions.BACK_LEFT);
-        this.directionList.add(5, Directions.FORWARD_LEFT);
-    }
+    private int rotationQuantity;
 
 
     public Hex(float hexpositionX, float hexpositionY) {
@@ -56,13 +39,12 @@ public class Hex{
         HexpositionY = hexpositionY;
 
         this.directionList = new ArrayList<Directions>(6);
-        this.neighbours = new ArrayList<Hex>(6);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
-        this.neighbours.add(null);
+        this.neighbours.put("0", -1);
+        this.neighbours.put("1", -1);
+        this.neighbours.put("2", -1);
+        this.neighbours.put("3", -1);
+        this.neighbours.put("4", -1);
+        this.neighbours.put("5", -1);
         this.directionList.add(0, Directions.FORWARD);
         this.directionList.add(1, Directions.FORWARD_RIGHT);
         this.directionList.add(2, Directions.BACK_RIGHT);
@@ -71,15 +53,14 @@ public class Hex{
         this.directionList.add(5, Directions.FORWARD_LEFT);
     }
 
-    public Hex(Context applicationContext) {
-
+    public Hex() {
     }
 
     public void addNeighbours(Hex hexNeighbour, Directions neighbourHexDirection) {
-        this.neighbours.set(neighbourHexDirection.getDirectionValue(), hexNeighbour);
+        this.neighbours.put(String.valueOf(neighbourHexDirection.getDirectionValue()), hexNeighbour.getId());
     }
 
-    public Hex getNeighbours(Directions hexDirection) {
+    public int getNeighbours(Directions hexDirection) {
         int kierunek = hexDirection.getDirectionValue();
         this.neighbours.get(kierunek);
         return this.neighbours.get(kierunek);
@@ -87,7 +68,7 @@ public class Hex{
 
 
     public Hex(List<Hex> neighbours, List<Directions> directionList, float hexpositionX, float hexpositionY) {
-        this.neighbours = neighbours;
+
         this.directionList = directionList;
         HexpositionX = hexpositionX;
         HexpositionY = hexpositionY;
@@ -121,6 +102,22 @@ public class Hex{
         return busy;
     }
 
+    public Map<String, Integer> getNeighbours() {
+        return neighbours;
+    }
+
+    public void setNeighbours(Map<String, Integer> neighbours) {
+        this.neighbours = neighbours;
+    }
+
+    public List<Directions> getDirectionList() {
+        return directionList;
+    }
+
+    public void setDirectionList(List<Directions> directionList) {
+        this.directionList = directionList;
+    }
+
     public void setBusy(boolean busy) {
         this.busy = busy;
     }
@@ -145,7 +142,32 @@ public class Hex{
         return tokenID;
     }
 
+    public int getRotationQuantity() {
+        return rotationQuantity;
+    }
+
+    public void setRotationQuantity(int rotationQuantity) {
+        this.rotationQuantity = rotationQuantity;
+    }
+
     public void setTokenID(int tokenID) {
         this.tokenID = tokenID;
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Integer> neighboursMap = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : neighbours.entrySet()) {
+            neighboursMap.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", id);
+        result.put("neighbours", neighboursMap);
+        result.put("directionList", directionList);
+        result.put("HexpositionX", HexpositionX);
+        result.put("HexpositionY", HexpositionY);
+        result.put("busy", busy);
+        result.put("tokenID", tokenID);
+        result.put("rotationQuantity", rotationQuantity);
+        return result;
     }
 }

@@ -22,6 +22,7 @@ import com.example.pracainzynierska.model.ArmyToken;
 import com.example.pracainzynierska.model.Attack;
 import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
 import com.example.pracainzynierska.model.Hex;
+import com.example.pracainzynierska.model.enums.Directions;
 import com.example.pracainzynierska.model.gameStatus.Board;
 import com.example.pracainzynierska.model.gameStatus.Player;
 import com.google.firebase.database.DatabaseReference;
@@ -45,14 +46,9 @@ public class HexUtils extends Application {
         return armyToken;
     }
 
-    public static void setToLobby(List<ArmyToken> armyTokens, ViewGroup viewgroup, List<Hex> listatest, Context context, Player player, DatabaseReference databaseReference,Board board) {
+    public static void setToLobby(ViewGroup viewgroup, List<Hex> listatest, Context context, DatabaseReference databaseReference,Board board,List<ArmyToken> armyTokens,String role) {
         int slot =0;
-        List<ArmyToken> lobby = player.getLobby();
-        List<ArmyToken> merge = new ArrayList<>();
-        merge.addAll(armyTokens);
-        merge.addAll(lobby);
-        player.setLobby(merge);
-        for (ArmyToken armyToken : merge) {
+        for (ArmyToken armyToken : armyTokens) {
             armyToken.setLayoutParams(new ViewGroup.LayoutParams(viewgroup.getWidth() / 10, viewgroup.getHeight() / 5));
             float centerHeightImageView = armyToken.getLayoutParams().height / 2;
             float centerWidthImageView = armyToken.getLayoutParams().width / 2;
@@ -74,11 +70,11 @@ public class HexUtils extends Application {
             slot++;
             viewgroup.addView(armyToken);
             armyToken.setOnClickListener(null);
-            armyToken.setOnTouchListener(onTouchListener(armyToken, listatest, viewgroup, context, player,databaseReference,board));
+            armyToken.setOnTouchListener(onTouchListener(armyToken, listatest, viewgroup, context,databaseReference,board,role));
         }
     }
 
-    public static void setToDraft(List<ArmyToken> randomToken, RelativeLayout lobby) {
+    public static List<ArmyToken> setToDraft(List<ArmyToken> randomToken, RelativeLayout lobby) {
         int slot = 1;
         for (ArmyToken armyToken : randomToken) {
             armyToken
@@ -103,6 +99,7 @@ public class HexUtils extends Application {
             lobby.addView(setToDraftSlot(lobby, armyToken, slot));
             slot++;
         }
+        return randomToken;
     }
 
 
@@ -168,7 +165,7 @@ public class HexUtils extends Application {
     }
 
 
-    public static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context, Player player, DatabaseReference databaseReference, Board board) {
+    public static View.OnTouchListener onTouchListener(ArmyToken tokenG, List listatest, ViewGroup viewGroup, Context context, DatabaseReference databaseReference, Board board,String role) {
 
         return new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -185,7 +182,7 @@ public class HexUtils extends Application {
                     case MotionEvent.ACTION_UP:
                         System.out.println("ACTION_UP");
                         int idPola = HexUtils.takeOnNerbyEmptyPlace(tokenG, listatest);
-                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, listatest, idPola, player,databaseReference, board);
+                        tokenG.confirmPositionToken(viewGroup, context.getApplicationContext(), tokenG, board.getHexBoard(), idPola,databaseReference, board,role);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         System.out.println("ACTION_MOVE");
@@ -223,6 +220,41 @@ public class HexUtils extends Application {
                 break;
         }
 
+    }
+
+    public static Player returnCurrentPlayer(Board board,String role){
+        if (role.equals("host")) {
+            if (board.getMessage().equals("host")) {
+               return board.getPlayer1();
+            }
+        } else {
+            if (board.getMessage().equals("quest")) {
+             return board.getPlayer2();
+            }
+        }
+        System.out.println("nie znaleziono gracza");
+        return null;
+    }
+
+   /* public List<Hex> getChainOfNeighboursInDirection(Hex hex, Directions direction) {
+        List<Hex> neighboursChain = new ArrayList<>();
+        Hex currentHex = hex;
+        while (currentHex.getNeighbours(direction) != null) {
+            currentHex = currentHex.getNeighbours(direction);
+            neighboursChain.add(currentHex);
+        }
+        return neighboursChain;
+    }*/
+
+    public void assignCurrentHexForAllTokens(List<ArmyToken> tokenList, List<Hex> hexList) {
+        for (ArmyToken token : tokenList) {
+            for (Hex hex : hexList) {
+                if (hex.getTokenID() == token.getId()) {
+                    token.setCurrentHex(hex);
+                    break;
+                }
+            }
+        }
     }
 
 }

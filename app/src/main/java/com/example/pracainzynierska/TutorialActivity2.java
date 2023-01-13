@@ -162,8 +162,8 @@ public class TutorialActivity2 extends AppCompatActivity implements View.OnClick
                 } else if (player.getDraft().stream().anyMatch(ArmyToken::isDraftDiscard)) {
                     //  draft.setVisibility(View.GONE);
                     //dodaj do lobby
-                    player.setLobby(player.getDraft().stream().filter(armyToken -> !armyToken.isDraftDiscard()).collect(Collectors.toList()));
-                    Toast.makeText(getApplicationContext(), String.valueOf(player.getLobby().size()), Toast.LENGTH_SHORT).show();
+                  //  player.setLobby(player.getDraft().stream().filter(armyToken -> !armyToken.isDraftDiscard()).collect(Collectors.toList()));
+                //    Toast.makeText(getApplicationContext(), String.valueOf(player.getLobby().size()), Toast.LENGTH_SHORT).show();
                     player.getDraft().stream().forEach(armyToken -> draft.removeView(armyToken));
                   //  HexUtils.setToLobby(player.getLobby(), relativeLayout,listatest,getApplicationContext(),player);
                     draft.setVisibility(View.GONE);

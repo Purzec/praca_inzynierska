@@ -14,7 +14,7 @@ public class Player {
 
     private List<ArmyTokenDto> chosenArmy;
 
-    private List<ArmyToken> lobby;
+    private List<Integer> lobbyID;
 
     private List<ArmyToken> draft;
 
@@ -22,9 +22,21 @@ public class Player {
 
     private String roleLobby;
 
+    private int hpBoss;
+
+    private int idChosenArmy;
+
     private int etap;
 
     private boolean flag;
+
+    public int getIdChosenArmy() {
+        return idChosenArmy;
+    }
+
+    public void setIdChosenArmy(int idChosenArmy) {
+        this.idChosenArmy = idChosenArmy;
+    }
 
     public boolean isFlag() {
         return flag;
@@ -42,8 +54,13 @@ public class Player {
         return chosenArmy;
     }
 
-    public List<ArmyToken> getLobby() {
-        return lobby;
+
+    public int getHpBoss() {
+        return hpBoss;
+    }
+
+    public void setHpBoss(int hpBoss) {
+        this.hpBoss = hpBoss;
     }
 
     public List<ArmyToken> getDraft() {
@@ -58,9 +75,6 @@ public class Player {
         this.chosenArmy = chosenArmy;
     }
 
-    public void setLobby(List<ArmyToken> lobby) {
-        this.lobby = lobby;
-    }
 
     public void setDraft(List<ArmyToken> draft) {
         this.draft = draft;
@@ -88,7 +102,7 @@ public class Player {
     }*/
 
     public Player() {
-        this.lobby = new ArrayList<>();
+        this.lobbyID = new ArrayList<>();
     }
 
     public String getRoleLobby() {
@@ -107,6 +121,13 @@ public class Player {
         this.roleLobby = roleLobby;
     }
 
+    public List<Integer> getLobbyID() {
+        return lobbyID;
+    }
+
+    public void setLobbyID(List<Integer> lobbyID) {
+        this.lobbyID = lobbyID;
+    }
 
     @Override
     public String toString() {
@@ -114,7 +135,7 @@ public class Player {
                 "id=" + id +
                 ", nick='" + nick + '\'' +
                 ", chosenArmy=" + chosenArmy +
-                ", lobby=" + lobby +
+                ", lobby=" + lobbyID +
                 ", draft=" + draft +
                 ", discardToken=" + discardToken +
                 ", roleLobby='" + roleLobby + '\'' +

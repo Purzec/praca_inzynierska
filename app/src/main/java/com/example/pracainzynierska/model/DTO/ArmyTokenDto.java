@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.example.pracainzynierska.model.Attack;
+import com.example.pracainzynierska.model.Hex;
 
 import java.util.List;
 
@@ -36,6 +37,16 @@ public class ArmyTokenDto {
     private int armyOwnerId;
 
     private String owner;
+
+    private Hex currentHex;
+
+    public Hex getCurrentHex() {
+        return currentHex;
+    }
+
+    public void setCurrentHex(Hex currentHex) {
+        this.currentHex = currentHex;
+    }
 
 
     /**
@@ -84,7 +95,13 @@ public class ArmyTokenDto {
         this.name = name;
     }
 
+    public int getRotationQuantity() {
+        return rotationQuantity;
+    }
 
+    public void setRotationQuantity(int rotationQuantity) {
+        this.rotationQuantity = rotationQuantity;
+    }
 
     public int getLife() {
         return life;

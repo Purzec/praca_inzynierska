@@ -171,7 +171,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
             case 1:
                 if (bylo == 0) {
                     Player player = new Player();
-                    player.setLobby(Arrays.asList(playerBase));
+                   // player.setLobbyID(Arrays.asList(playerBase));
                     bylo++;
                     //dodac sprawdzenie czy juz było wywołane todo jp
                     //dodanie tokenu bazy gracza

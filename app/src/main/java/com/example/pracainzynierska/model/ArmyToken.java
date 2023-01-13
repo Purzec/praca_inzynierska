@@ -1,5 +1,5 @@
 package com.example.pracainzynierska.model;
-
+//TODO JP DODAC ROTACJE
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 
 import com.example.pracainzynierska.R;
 import com.example.pracainzynierska.commons.HexUtils;
+import com.example.pracainzynierska.model.enums.Directions;
 import com.example.pracainzynierska.model.gameStatus.Board;
 import com.example.pracainzynierska.model.gameStatus.Player;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -88,6 +89,18 @@ public class ArmyToken extends View {
      */
     private int armyOwnerId;
 
+    private Hex currentHex;
+
+    private boolean onBoard = false;
+
+    public Hex getCurrentHex() {
+        return currentHex;
+    }
+
+    public void setCurrentHex(Hex currentHex) {
+        this.currentHex = currentHex;
+    }
+
 
     public int getArmyOwnerId() {
         return armyOwnerId;
@@ -121,7 +134,7 @@ public class ArmyToken extends View {
         this.cancelDrawable = cancelDrawable;
     }
 
-    private boolean onBoard = false;
+
 
     public boolean isOnBoard() {
         return onBoard;
@@ -194,7 +207,7 @@ public class ArmyToken extends View {
         this.draftDiscard = draftDiscard;
     }
 
-    public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola, Player player, DatabaseReference databaseReference, Board board) {
+    public boolean confirmPositionToken(ViewGroup viewGroup, Context context, ArmyToken armyToken, List<Hex> hexList, int idPola, DatabaseReference databaseReference, Board board, String role) {
 // pobierz rozmiary ekrany
         //dodać przyciski obrotu ekranu
         board.setUpdating(true);
@@ -276,13 +289,15 @@ public class ArmyToken extends View {
             public void onClick(View view) {
                 hexList.get(idPola).setBusy(true);
                 hexList.get(idPola).setTokenID(armyToken.getId());
+                hexList.get(idPola).setRotationQuantity(armyToken.getRotationQuantity());
                 viewGroup.removeView(ok);
                 viewGroup.removeView(no);
                 viewGroup.removeView(leftArrow);
                 viewGroup.removeView(rightArrow);
                 armyToken.setOnTouchListener(null);
                 armyToken.setOnBoard(true);
-                player.getLobby().remove(armyToken);
+                armyToken.setCurrentHex(hexList.get(idPola));
+                HexUtils.returnCurrentPlayer(board,role).getLobbyID().remove(Integer.valueOf(armyToken.getId()));
                 databaseReference.updateChildren(board.toMap())
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -310,11 +325,25 @@ public class ArmyToken extends View {
                 viewGroup.removeView(leftArrow);
                 viewGroup.removeView(rightArrow);
                 HexUtils.goToLobbySlot(armyToken);
-                armyToken.setOnTouchListener(HexUtils.onTouchListener(armyToken,hexList,viewGroup,context,player,databaseReference,board));
+                armyToken.setOnTouchListener(HexUtils.onTouchListener(armyToken,hexList,viewGroup,context,databaseReference,board,role));
             }
         });
 
         return armyToken.isOnBoard();
 
+    }
+
+    /**
+     * Metoda aktualizuje kierunek ataków w ArmyTokenie na podstawie wartości rotationQuantity
+     * Dla każdego ataku w liście attacks, kierunek jest inkrementowany o rotationQuantity.
+     * Jeśli kierunek przekroczy granicę 6, zostaje zresetowany do 0
+     */
+    public void updateAttackDirections() {
+        for (Attack attack : this.attacks) {
+            int direction = attack.getDirections().getDirectionValue();
+            direction += this.rotationQuantity;
+            direction = direction % 6;
+            attack.setDirections(Directions.values()[direction]);
+        }
     }
 }

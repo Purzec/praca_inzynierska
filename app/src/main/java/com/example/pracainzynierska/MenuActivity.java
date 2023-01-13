@@ -23,6 +23,7 @@ import com.example.pracainzynierska.databinding.ActivityMenuBinding;
 import com.example.pracainzynierska.model.Attack;
 import com.example.pracainzynierska.model.DTO.ArmyTokenDto;
 import com.example.pracainzynierska.model.DTO.AttackDto;
+import com.example.pracainzynierska.model.fragments.CreateRoomFragments;
 import com.example.pracainzynierska.model.fragments.LoginFragment;
 
 import java.io.ByteArrayOutputStream;
@@ -88,6 +89,18 @@ public class MenuActivity extends AppCompatActivity{
         setContentView(binding.getRoot());
         mContentView = binding.menu;
         initDatabase();
+        String fragmentName = getIntent().getStringExtra("fragmentName");
+        if (fragmentName != null) {
+            switch (fragmentName) {
+                case "CreateRoomFragment":
+                    CreateRoomFragments createRoomFragments = new CreateRoomFragments();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainerView, createRoomFragments, "loginFragment")
+                            .addToBackStack(null)
+                            .commit();
+                    break;
+            }
+        }
     }
 
 

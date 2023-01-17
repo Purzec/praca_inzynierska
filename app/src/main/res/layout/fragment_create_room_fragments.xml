@@ -50,7 +50,7 @@
             android:id="@+id/createRoom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/createRoom"
+            android:text="@string/lobby"
             android:backgroundTint="@color/black_overlay"
             android:textColor="@color/white"/>
 

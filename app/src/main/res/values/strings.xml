@@ -10,15 +10,17 @@
     <string name="title_activity_tutorial2">TutorialActivity2</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="register">Zarejestruj się</string>
+    <string name="reset_password">Zapomniałem hasła</string>
     <string name="forget_password">Zapomniałem hasła</string>
     <string name="password">Hasło</string>
     <string name="email">E-mail</string>
     <string name="login">Zaloguj</string>
     <string name="logout">WYLOGUJ</string>
-    <string name="game_name">HEXBattle</string>
+    <string name="game_name">HexBattle</string>
     <string name="nick">Nazwa Gracza</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="createRoom">Stwórz pokój</string>
+    <string name="lobby">LOBBY POKOI</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_game">GameActivity</string>

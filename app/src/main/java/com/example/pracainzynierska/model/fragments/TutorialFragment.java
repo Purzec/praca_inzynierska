@@ -33,7 +33,7 @@ public class TutorialFragment extends Fragment implements View.OnClickListener {
     private static final String ARG_PARAM2 = "param2";
     ViewGroup viewGroup;
     ConstraintLayout constraintLayout;
-    Button goToMenu, practice;
+    Button goToMenu;
     ImageButton left, right;
     int page = 0;
     // TODO: Rename and change types of parameters
@@ -84,8 +84,8 @@ public class TutorialFragment extends Fragment implements View.OnClickListener {
         viewGroup = view.findViewById(R.id.tutorialFragment);
         goToMenu = view.findViewById(R.id.goToMenu);
         goToMenu.setOnClickListener(this);
-        practice = view.findViewById(R.id.practice);
-        practice.setOnClickListener(this);
+     //   practice = view.findViewById(R.id.practice);
+     //   practice.setOnClickListener(this);
         left = view.findViewById(R.id.leftArrow);
         left.setOnClickListener(this);
         right = view.findViewById(R.id.rightArrow);
@@ -107,9 +107,9 @@ public class TutorialFragment extends Fragment implements View.OnClickListener {
                         .addToBackStack(null)
                         .commit();
                 break;
-            case R.id.practice:
+          /*  case R.id.practice:
                 startActivity(new Intent(getContext(), TutorialActivity.class));
-                break;
+                break;*/
             case R.id.leftArrow:
                 page--;
                 turnPage(page,view);

@@ -276,7 +276,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                                     DatabaseReference roomRef = database.getReference("rooms/" + roomName);
                                     roomRef.removeValue();
                                     Bundle bundle = new Bundle();
-                                    bundle.putString("fragmentName", "CreateRoomFragment");
+                                    bundle.putString("fragmentName", "  ");
                                     Intent intent = new Intent(GameActivity.this, MenuActivity.class);
                                     System.out.println("koniec gry");
                                     intent.putExtras(bundle);

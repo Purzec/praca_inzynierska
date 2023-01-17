@@ -38,7 +38,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private String mParam1;
     private String mParam2;
 
-    private TextView register, logo;
+    private TextView register, logo, password;
     private EditText editTextEmail, editTextPassword;
     private Button signIn;
     private FirebaseAuth mAuth;
@@ -87,7 +87,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         logo = view.findViewById(R.id.gameName);
         logo.setOnClickListener(this);
-
+        password = view.findViewById(R.id.resetPassword);
+        password.setOnClickListener(this);
         register = view.findViewById(R.id.register);
         register.setOnClickListener(this);
 
@@ -117,6 +118,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     userLogin();
                 }
                 break;
+                case R.id.resetPassword:
+                    RememberPasswordFragment rememberPasswordFragment = new RememberPasswordFragment();
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainerView, rememberPasswordFragment, "menuFragment")
+                            .addToBackStack(null)
+                            .commit();
+                    break;
         }
     }
 
@@ -137,10 +145,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                 .addToBackStack(null)
                                 .commit();
                     } else {
-                         Toast.makeText(getContext(), "Aktywuj swoje konto", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Aktywuj swoje konto", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                        Toast.makeText(getContext(), "BAD CREDINTIAL", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "BAD CREDINTIAL", Toast.LENGTH_SHORT).show();
                 }
             }
         });

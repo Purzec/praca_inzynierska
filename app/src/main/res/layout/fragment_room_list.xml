@@ -19,7 +19,7 @@
         android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="CREATE A ROOM"
+        android:text="STWÓRZ POKÓJ"
         android:textColor="@color/white"
         android:backgroundTint="@color/black_overlay"/>
 

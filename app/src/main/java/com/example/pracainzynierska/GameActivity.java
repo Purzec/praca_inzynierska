@@ -658,32 +658,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void game(Board board) {
         if (board.getPlayer1() != null && board.getPlayer2() != null) {
-            System.out.println("Wywołano metodę game");
             waiting.setVisibility(View.GONE);
             if (role.equals("host")) {
                 if (board.getMessage().equals("host")) {
-                    System.out.println("Ekran widzi gracz: " + board.getPlayer1().getNick());
                     gameTurn(board.getPlayer1());
                     isClickable(board.getPlayer1());
                 }
             } else {
                 if (board.getMessage().equals("quest")) {
-                    System.out.println("Ekran widzi gracz: " + board.getPlayer2().getNick());
                     gameTurn(board.getPlayer2());
                     isClickable(board.getPlayer2());
                 }
             }
-
         }
-
     }
 
     private void gameTurn(Player player) {
-        //zrobić zabezpieczenie zeby wykonywało sie tylko w sytuacji kiedy klikamy endturn
         switch (player.getEtap()) {
             case 1:
                 if (player.getChosenArmy() == null) {
-                    System.out.println("wybór armii");
                     List<String> armyList = Arrays.asList("Elf", "Human");
                     listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, armyList));
                     listViewArmy.setVisibility(View.VISIBLE);
@@ -700,7 +693,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case 2:
-                player.setFlag(false);
                 ArmyToken armyTokens = createArmyToken(getBoss(player.getChosenArmy()), getApplicationContext(), mContentView);
                 player.getChosenArmy().remove(player.getChosenArmy().stream().filter(tokenDto -> tokenDto.getName().equals("dowodca")).findFirst().get());
                 player.setHpBoss(armyTokens.getLife());
@@ -710,17 +702,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 player.setLobbyID(test.stream().map(ArmyToken::getId).collect(Collectors.toList()));
                 HexUtils.setToLobby(boardView, board.getHexBoard(), getApplicationContext(), messageRef, board, test, role);
                 armyTokens.setVisibility(View.VISIBLE);
-                System.out.println("postawienie dowódcy");
-                //zrobic usuniecie dowodcy z armii
-
                 player.setEtap(3);
                 break;
             default:
                 if (!board.isUpdating()) {
                     board.setUpdating(true);
                     noClickable();
-                    System.out.println("tury normalne");
-                    //draft steworzenie 3 losowych tokenoów i usuniecie ich z listy
                     List<ArmyToken> random3Tokens = createArmyTokens(pickRandomElements(player.getChosenArmy(), board), getApplicationContext(), mContentView);
                     draftView.setVisibility(View.VISIBLE);
                     draftView.bringToFront();

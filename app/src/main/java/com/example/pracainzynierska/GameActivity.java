@@ -687,10 +687,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             player.setEtap(2);
                             String chosenArmy = armyList.get(i);
                             player.setChosenArmy(armyTokenGet(getPlayerNumber(chosenArmy, board.getMessage())));
-                            endTurn(view);
-                        }
-                    });
-                }
+                            endTurn(view);}});}
                 break;
             case 2:
                 ArmyToken armyTokens = createArmyToken(getBoss(player.getChosenArmy()), getApplicationContext(), mContentView);
@@ -711,10 +708,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     List<ArmyToken> random3Tokens = createArmyTokens(pickRandomElements(player.getChosenArmy(), board), getApplicationContext(), mContentView);
                     draftView.setVisibility(View.VISIBLE);
                     draftView.bringToFront();
-                    player.setDraft(HexUtils.setToDraft(random3Tokens, draftView));
-                }
-                break;
-        }
+                    player.setDraft(HexUtils.setToDraft(random3Tokens, draftView));}
+                break;}
     }
 
     public static List<ArmyTokenDto> pickRandomElements(List<ArmyTokenDto> list, Board board) {

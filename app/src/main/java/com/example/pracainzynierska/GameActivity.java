@@ -195,68 +195,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     // pobierz wartości wszystkich pól z bazy danych i ustaw je w obiekcie klasy Board
-                    if (dataSnapshot.child("message").getValue() == null){
+                    if (dataSnapshot.child("message").getValue() == null) {
                         Bundle bundle = new Bundle();
                         bundle.putString("fragmentName", "CreateRoomFragment");
                         Intent intent = new Intent(GameActivity.this, MenuActivity.class);
-                        System.out.println("koniec gry");
                         intent.putExtras(bundle);
-                        //wroc na intent menu z fragmentem po zalogowaniu
                         startActivity(intent);
                         finish();
                     }
-                    board.setMessage(dataSnapshot.child("message").getValue(String.class));
-                    board.setLastRound((Boolean.TRUE.equals(dataSnapshot.child("lastRound").getValue(boolean.class))));
-                    board.setP1info(dataSnapshot.child("p1info").getValue(Player.class));
-                    board.setP2info(dataSnapshot.child("p2info").getValue(Player.class));
-                    if (dataSnapshot.child("player1").getValue(Player.class) == null) {
-                        board.setPlayer1(dataSnapshot.child("p1info").getValue(Player.class));
-                    } else {
-                        board.setPlayer1(dataSnapshot.child("player1").getValue(Player.class));
-                    }
-                    if (dataSnapshot.child("player2").getValue(Player.class) == null) {
-                        board.setPlayer2(dataSnapshot.child("p2info").getValue(Player.class));
-                    } else {
-                        board.setPlayer2(dataSnapshot.child("player2").getValue(Player.class));
-                    }
-                    if (dataSnapshot.child("hexBoard").getValue() != null) {
-                        localHexList = board.getHexBoard();
-                        List<Map<String, Object>> hexBoardData = dataSnapshot.child("hexBoard").getValue(new GenericTypeIndicator<List<Map<String, Object>>>() {
-                        });
-                        List<Hex> hexBoard = new ArrayList<>();
-
-                        if (hexBoardData != null) {
-                            for (Map<String, Object> hexData : hexBoardData) {
-                                Hex hex = new Hex();
-                                Long id = (Long) hexData.get("id");
-                                hex.setId(id.intValue());
-                                Long tokenID = (Long) hexData.get("tokenID");
-                                hex.setTokenID(tokenID.intValue());
-                                Long rotationQuantity = (Long) hexData.get("rotationQuantity");
-                                hex.setRotationQuantity(rotationQuantity.intValue());
-                                hex.setNeighbours(arrayListToMap((List<Long>) hexData.get("neighbours")));
-                                hex.setHexpositionX(convertToFloat(hexData.get("HexpositionX")));
-                                hex.setHexpositionY(convertToFloat(hexData.get("HexpositionY")));
-                                hex.setBusy((Boolean) hexData.get("busy"));
-
-                                hexBoard.add(hex);
-                            }
-                            board.setHexBoard(hexBoard);
-                        }
-                    }
-
+                    setBoardValues(dataSnapshot, board);
                     updateView(board, localHexList);
-                    if (board.getPlayer1() != null && board.getPlayer2() != null) {
-                        if (board.getPlayer1().getChosenArmy() != null && board.getPlayer2().getChosenArmy() != null) {
-                            player1hp.setText(String.valueOf("Zdrowie dowódcy gracza " + board.getPlayer1().getNick() + " : " + board.getPlayer1().getHpBoss()));
-                            player2hp.setText(String.valueOf("Zdrowie dowódcy gracza " + board.getPlayer2().getNick() + " : " + board.getPlayer2().getHpBoss()));
-                            player1hp.setVisibility(View.VISIBLE);
-                            player2hp.setVisibility(View.VISIBLE);
-                        }
-                    }
+
+                    setPlayerHp(board,player1hp,player2hp);
+
                     if (!board.isLastRound()) {
                         game(board);
-                    }else {
+                    } else {
                         if (board.isLastRound()) {
                             messageRef.removeEventListener(valueEventListener);
                             Toast toast = Toast.makeText(getApplicationContext(), getWinner(board.getPlayer1(), board.getPlayer2()), Toast.LENGTH_LONG);
@@ -296,6 +250,65 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     System.out.println("bład");
                 }
             });
+        }
+    }
+
+    private void setPlayerHp(Board board, TextView player1hp, TextView player2hp) {
+        if (board.getPlayer1() != null && board.getPlayer2() != null) {
+            if (board.getPlayer1().getChosenArmy() != null && board.getPlayer2().getChosenArmy() != null) {
+                player1hp.setText(String.valueOf("Zdrowie dowódcy gracza " + board.getPlayer1().getNick() + " : " + board.getPlayer1().getHpBoss()));
+                player2hp.setText(String.valueOf("Zdrowie dowódcy gracza " + board.getPlayer2().getNick() + " : " + board.getPlayer2().getHpBoss()));
+                player1hp.setVisibility(View.VISIBLE);
+                player2hp.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void setBoardValues(DataSnapshot dataSnapshot, Board board) {
+        board.setMessage(dataSnapshot.child("message").getValue(String.class));
+        board.setLastRound((Boolean.TRUE.equals(dataSnapshot.child("lastRound").getValue(boolean.class))));
+        board.setP1info(dataSnapshot.child("p1info").getValue(Player.class));
+        board.setP2info(dataSnapshot.child("p2info").getValue(Player.class));
+        if (dataSnapshot.child("player1").getValue(Player.class) == null) {
+            board.setPlayer1(dataSnapshot.child("p1info").getValue(Player.class));
+        } else {
+            board.setPlayer1(dataSnapshot.child("player1").getValue(Player.class));
+        }
+        if (dataSnapshot.child("player2").getValue(Player.class) == null) {
+            board.setPlayer2(dataSnapshot.child("p2info").getValue(Player.class));
+        } else {
+            board.setPlayer2(dataSnapshot.child("player2").getValue(Player.class));
+        }
+        if (dataSnapshot.child("hexBoard").getValue() != null) {
+            localHexList = board.getHexBoard();
+            List<Map<String, Object>> hexBoardData = dataSnapshot.child("hexBoard").getValue(new GenericTypeIndicator<List<Map<String, Object>>>() {
+            });
+            List<Hex> hexBoard = new ArrayList<>();
+
+            if (hexBoardData != null) {
+                processHexBoardData(hexBoardData, hexBoard);
+            }
+        }
+    }
+
+    private void processHexBoardData(List<Map<String, Object>> hexBoardData, List<Hex> hexBoard) {
+        if (hexBoardData != null) {
+            for (Map<String, Object> hexData : hexBoardData) {
+                Hex hex = new Hex();
+                Long id = (Long) hexData.get("id");
+                hex.setId(id.intValue());
+                Long tokenID = (Long) hexData.get("tokenID");
+                hex.setTokenID(tokenID.intValue());
+                Long rotationQuantity = (Long) hexData.get("rotationQuantity");
+                hex.setRotationQuantity(rotationQuantity.intValue());
+                hex.setNeighbours(arrayListToMap((List<Long>) hexData.get("neighbours")));
+                hex.setHexpositionX(convertToFloat(hexData.get("HexpositionX")));
+                hex.setHexpositionY(convertToFloat(hexData.get("HexpositionY")));
+                hex.setBusy((Boolean) hexData.get("busy"));
+
+                hexBoard.add(hex);
+            }
+            board.setHexBoard(hexBoard);
         }
     }
 
@@ -363,8 +376,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 board.getPlayer1().setLobbyID(new ArrayList<>());
                 board.getPlayer2().setHpBoss(getHealthOfCommander(board.getPlayer2().getIdChosenArmy(), armyTokensForBattle));
                 board.getPlayer1().setHpBoss(getHealthOfCommander(board.getPlayer1().getIdChosenArmy(), armyTokensForBattle));
-
-
 
 
                 //wykonujemy atak dla tokenów o inicjatywie x

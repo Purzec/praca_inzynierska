@@ -332,7 +332,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateView(Board board, List<Hex> localHexList) {
-        //mamy dwie listy lokalną i aktualną na bazie
         if (localHexList != null) {
             List<Hex> localBusyHex = localHexList.stream().filter(Hex::isBusy).collect(Collectors.toList());
             List<Hex> globalBusyHex = board.getHexBoard().stream().filter(Hex::isBusy).collect(Collectors.toList());
@@ -354,19 +353,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             if (globalBusyHex.size() == board.getHexBoard().size() || board.isLastRound()) {
                 Toast.makeText(getApplicationContext(), "BITWAAA", Toast.LENGTH_SHORT).show();
                 List<ArmyToken> armyTokensForBattle = new ArrayList<>();
-                //pobranie tokenów z widoku
                 findArmyTokensForBattle(boardView, armyTokensForBattle);
                 removeTokensFromLobby(armyTokensForBattle, boardView);
-                //sprawdzmy czy kierunki sie dobrze zaktualizowały
                 updateAllAttacksDirections(armyTokensForBattle);
-                //bitwa z tokenami
-                //pobierami max inicjatywe
                 int maxInitiative = getMaxInitiative(armyTokensForBattle);
                 for (int i = maxInitiative; i >= 0; i--) {
-                    //mamy tutaj bitwe dla konretnej inicjatywy najpierw 3
                     List<ArmyToken> armyTokensByInitiative = getArmyTokensByInitiative(armyTokensForBattle, i);
-                    //na tych tokenach wykonujemy atak
-                    //pobierz tokena
                     for (ArmyToken armyToken : armyTokensByInitiative) {
                         performAttacks(armyToken, i, armyTokensForBattle);
                     }
@@ -377,14 +369,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 board.getPlayer1().setLobbyID(new ArrayList<>());
                 board.getPlayer2().setHpBoss(getHealthOfCommander(board.getPlayer2().getIdChosenArmy(), armyTokensForBattle));
                 board.getPlayer1().setHpBoss(getHealthOfCommander(board.getPlayer1().getIdChosenArmy(), armyTokensForBattle));
-
-
-                //wykonujemy atak dla tokenów o inicjatywie x
-                // usuwamy te tokeny ktore maja mniej niz 0
-                //
-
-
-//musimy pobrac z widoku wyszstkie tokeny jakie sie na nim znajdują i są na planszy
             }
         }
     }

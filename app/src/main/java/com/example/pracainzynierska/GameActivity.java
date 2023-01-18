@@ -212,42 +212,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         game(board);
                     } else {
                         if (board.isLastRound()) {
-                            messageRef.removeEventListener(valueEventListener);
-                            Toast toast = Toast.makeText(getApplicationContext(), getWinner(board.getPlayer1(), board.getPlayer2()), Toast.LENGTH_LONG);
-                            toast.show();
-
-                            View toastView = toast.getView();
-                            toastView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-                                @Override
-                                public void onViewAttachedToWindow(View v) {
-                                    // Toast jest wyświetlony
-                                }
-
-                                @Override
-                                public void onViewDetachedFromWindow(View v) {
-                                    // Toast jest już nie widoczny
-                                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                    DatabaseReference roomRef = database.getReference("rooms/" + roomName);
-                                    roomRef.removeValue();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("fragmentName", "  ");
-                                    Intent intent = new Intent(GameActivity.this, MenuActivity.class);
-                                    System.out.println("koniec gry");
-                                    intent.putExtras(bundle);
-                                    //wroc na intent menu z fragmentem po zalogowaniu
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            });
-
-
+                        endGame(messageRef,valueEventListener,board,roomName);
                         }
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    System.out.println("bład");
+                    databaseError.getMessage();
                 }
             });
         }
@@ -289,6 +260,36 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 processHexBoardData(hexBoardData, hexBoard);
             }
         }
+    }
+
+    private void endGame(DatabaseReference messageRef, ValueEventListener valueEventListener, Board board, String roomName) {
+        messageRef.removeEventListener(valueEventListener);
+        Toast toast = Toast.makeText(getApplicationContext(), getWinner(board.getPlayer1(), board.getPlayer2()), Toast.LENGTH_LONG);
+        toast.show();
+
+        View toastView = toast.getView();
+        toastView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                // Toast jest wyświetlony
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                // Toast jest już nie widoczny
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference roomRef = database.getReference("rooms/" + roomName);
+                roomRef.removeValue();
+                Bundle bundle = new Bundle();
+                bundle.putString("fragmentName", "  ");
+                Intent intent = new Intent(GameActivity.this, MenuActivity.class);
+                System.out.println("koniec gry");
+                intent.putExtras(bundle);
+                //wroc na intent menu z fragmentem po zalogowaniu
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void processHexBoardData(List<Map<String, Object>> hexBoardData, List<Hex> hexBoard) {

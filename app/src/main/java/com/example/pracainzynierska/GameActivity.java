@@ -66,6 +66,7 @@ import java.util.stream.Collectors;
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
     SQLiteDatabase db;
     List<ArmyTokenDto> tmpArmy;
+    private boolean flag = false;
     ValueEventListener valueEventListener;
     ListView listView;
     ImageButton button;
@@ -206,16 +207,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     setBoardValues(dataSnapshot, board);
                     updateView(board, localHexList);
 
-                    setPlayerHp(board,player1hp,player2hp);
+                    setPlayerHp(board, player1hp, player2hp);
 
                     if (!board.isLastRound()) {
                         game(board);
                     } else {
                         if (board.isLastRound()) {
-                        endGame(messageRef,valueEventListener,board,roomName);
+                            endGame(messageRef, valueEventListener, board, roomName);
                         }
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     databaseError.getMessage();
@@ -661,7 +663,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         switch (player.getEtap()) {
             case 1:
                 if (player.getChosenArmy() == null) {
-                    List<String> armyList = Arrays.asList("Elf", "Human");
+                    List<String> armyList = Arrays.asList("Elfy", "Ludzie");
                     listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, armyList));
                     listViewArmy.setVisibility(View.VISIBLE);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -671,7 +673,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             player.setEtap(2);
                             String chosenArmy = armyList.get(i);
                             player.setChosenArmy(armyTokenGet(getPlayerNumber(chosenArmy, board.getMessage())));
-                            endTurn(view);}});}
+                            endTurn(view);
+                        }
+                    });
+                }
                 break;
             case 2:
                 ArmyToken armyTokens = createArmyToken(getBoss(player.getChosenArmy()), getApplicationContext(), mContentView);
@@ -692,16 +697,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     List<ArmyToken> random3Tokens = createArmyTokens(pickRandomElements(player.getChosenArmy(), board), getApplicationContext(), mContentView);
                     draftView.setVisibility(View.VISIBLE);
                     draftView.bringToFront();
-                    player.setDraft(HexUtils.setToDraft(random3Tokens, draftView));}
-                break;}
+                    player.setDraft(HexUtils.setToDraft(random3Tokens, draftView));
+                }
+                break;
+        }
     }
 
-    public static List<ArmyTokenDto> pickRandomElements(List<ArmyTokenDto> list, Board board) {
+    public List<ArmyTokenDto> pickRandomElements(List<ArmyTokenDto> list, Board board) {
         Random rand = new Random();
         List<ArmyTokenDto> result = new ArrayList<>();
         int size = list.size();
         if (size <= 3) {
-            board.setLastRound(true);
+            flag = true;
+            Toast.makeText(getApplicationContext(), "TO JEST OSTATNIA TURA", Toast.LENGTH_SHORT).show();
             return list;
         }
         for (int i = 0; i < 3; i++) {
@@ -751,7 +759,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             List<ArmyToken> armyTokens = player.getDraft().stream().filter(armyToken -> !armyToken.isDraftDiscard()).collect(Collectors.toList());
             player.setLobbyID(armyTokens.stream().map(ArmyToken::getId).collect(Collectors.toList()));
-            Toast.makeText(getApplicationContext(), String.valueOf(player.getLobbyID().size()), Toast.LENGTH_SHORT).show();
             player.getDraft().stream().forEach(armyToken -> draftView.removeView(armyToken));
             player.setDraft(null);
             HexUtils.setToLobby(boardView, board.getHexBoard(), getApplicationContext(), messageRef, board, test, role);
@@ -764,6 +771,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void endTurn(View view) {
+        if (flag) {
+            board.setLastRound(true);
+        }
         board.setUpdating(false);
         if (board.getMessage().equals("quest")) {
             noClickable();

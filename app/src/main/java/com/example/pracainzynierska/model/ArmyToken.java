@@ -342,8 +342,11 @@ public class ArmyToken extends View {
         for (Attack attack : this.attacks) {
             int direction = attack.getDirections().getDirectionValue();
             direction += this.rotationQuantity;
-            direction = direction % 6;
-            attack.setDirections(Directions.values()[direction]);
+            if (direction >6){
+                direction = direction-6;
+            }
+            this.rotationQuantity=0;
+            attack.setDirections(Directions.values()[direction-1]);
         }
     }
 }

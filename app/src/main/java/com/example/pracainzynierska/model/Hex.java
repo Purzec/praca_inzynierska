@@ -38,19 +38,12 @@ public class Hex {
         HexpositionX = hexpositionX;
         HexpositionY = hexpositionY;
 
-        this.directionList = new ArrayList<Directions>(6);
-        this.neighbours.put("0", -1);
         this.neighbours.put("1", -1);
         this.neighbours.put("2", -1);
         this.neighbours.put("3", -1);
         this.neighbours.put("4", -1);
         this.neighbours.put("5", -1);
-        this.directionList.add(0, Directions.FORWARD);
-        this.directionList.add(1, Directions.FORWARD_RIGHT);
-        this.directionList.add(2, Directions.BACK_RIGHT);
-        this.directionList.add(3, Directions.BACK);
-        this.directionList.add(4, Directions.BACK_LEFT);
-        this.directionList.add(5, Directions.FORWARD_LEFT);
+        this.neighbours.put("6", -1);
     }
 
     public Hex() {

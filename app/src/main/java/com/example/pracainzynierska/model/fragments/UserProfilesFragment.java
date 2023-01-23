@@ -18,11 +18,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.pracainzynierska.GameActivity;
-import com.example.pracainzynierska.MainActivity3;
 import com.example.pracainzynierska.R;
-import com.example.pracainzynierska.model.gameStatus.Board;
 import com.example.pracainzynierska.model.gameStatus.Player;
-import com.example.pracainzynierska.model.view.HexBoard;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,10 +32,10 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link RoomList#newInstance} factory method to
+ * Use the {@link UserProfilesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomList extends Fragment {
+public class UserProfilesFragment extends Fragment {
 
     ListView listView;
     Button button;
@@ -52,7 +49,7 @@ public class RoomList extends Fragment {
     DatabaseReference boardRef;
     DatabaseReference messRef;
 
-    public RoomList() {
+    public UserProfilesFragment() {
         // Required empty public constructor
     }
 
@@ -65,8 +62,8 @@ public class RoomList extends Fragment {
      * @return A new instance of fragment RoomList.
      */
     // TODO: Rename and change types and number of parameters
-    public static RoomList newInstance(String param1, String param2) {
-        RoomList fragment = new RoomList();
+    public static UserProfilesFragment newInstance(String param1, String param2) {
+        UserProfilesFragment fragment = new UserProfilesFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;

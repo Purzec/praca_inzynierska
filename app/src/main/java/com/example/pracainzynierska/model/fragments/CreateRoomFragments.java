@@ -1,6 +1,5 @@
 package com.example.pracainzynierska.model.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 
 import com.example.pracainzynierska.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,9 +86,9 @@ public class CreateRoomFragments extends Fragment implements View.OnClickListene
                         .commit();
                 break;
             case R.id.createRoom:
-                RoomList roomList = new RoomList();
+                UserProfilesFragment userProfilesFragment = new UserProfilesFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentContainerView, roomList, "findThisFragment")
+                        .replace(R.id.fragmentContainerView, userProfilesFragment, "findThisFragment")
                         .addToBackStack(null)
                         .commit();
                 break;
